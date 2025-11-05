@@ -24,4 +24,12 @@ export default {
 }
 ```
 
+puis remplacer dans le fichier index.css le css pas 
+
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
 et c'est bon.
