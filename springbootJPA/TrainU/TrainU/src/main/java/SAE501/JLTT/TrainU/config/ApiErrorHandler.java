@@ -22,6 +22,8 @@ public class ApiErrorHandler {
         ));
     }
 
+    ///
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String,Object>> badRequest(MethodArgumentNotValidException ex) {
         var errors = ex.getBindingResult().getFieldErrors().stream()
