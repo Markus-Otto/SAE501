@@ -19,7 +19,7 @@
     <description>API pour liaison entre BD et site de formation</description>
 
     <properties>
-        <!-- ⚠️ si ton Java est 17 ou 21, change ici -->
+        <!-- si ton Java est 17 ou 21, change ici -->
         <java.version>17</java.version>
     </properties>
 

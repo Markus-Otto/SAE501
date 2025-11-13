@@ -39,40 +39,36 @@ public class StripePortImpl implements StripePort {
     public String createPaymentIntent(int amountCent, String currency, String email,
                                       Map<String, String> metadata, String idemKey) {
         try {
-            // Construction des paramètres du PaymentIntent
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount((long) amountCent)
                     .setCurrency(currency)
-                    // En test : on force une carte test et la confirmation immédiate
-                    .setPaymentMethod("pm_card_visa")
-                    .setConfirm(true)
+                    // on laisse Stripe choisir le PM via Elements (pas de pm_* en dur)
                     .setReceiptEmail(email)
-                    // Active les "Automatic Payment Methods" mais interdit toute redirection
-                    // => pas besoin de return_url pour Bancontact/Ideal etc. pendant nos tests API
                     .setAutomaticPaymentMethods(
                             PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
                                     .setEnabled(true)
-                                    .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
+                                    .setAllowRedirects(
+                                            PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER
+                                    )
                                     .build()
                     )
                     .putAllMetadata(metadata)
                     .build();
 
-            // Options d’appel : on met une clé d’idempotence
-            var options = com.stripe.net.RequestOptions.builder()
+            // idempotency pour éviter les doubles créations
+            com.stripe.net.RequestOptions options = com.stripe.net.RequestOptions.builder()
                     .setIdempotencyKey(idemKey)
                     .build();
 
-            // Appel Stripe : création réelle du PaymentIntent
             PaymentIntent pi = PaymentIntent.create(params, options);
-
-            // On renvoie l’ID + le client_secret (utile côté front quand on aura un vrai flow)
+            // on renvoie id + clientSecret (confirm côté front)
             return pi.getId() + ":" + pi.getClientSecret();
+
         } catch (Exception e) {
-            // On re-wrappe l’erreur Stripe dans une RuntimeException claire
             throw new RuntimeException("Erreur Stripe: " + e.getMessage(), e);
         }
     }
+
 
     /**
      * Annule un PaymentIntent (utile si on veut “rollback” un paiement non capturé, etc.).
