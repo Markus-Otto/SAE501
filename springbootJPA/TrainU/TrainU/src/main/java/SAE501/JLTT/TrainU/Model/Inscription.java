@@ -1,7 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 
@@ -31,9 +30,9 @@ public class Inscription {
     private LocalDateTime dateInscription;
 
 
-   // @ManyToOne
-    //@JoinColumn(name = "ID_APPRENANT", nullable = false)
-    //private Apprenant apprenant;
+    @ManyToOne
+    @JoinColumn(name = "ID_APPRENANT", nullable = false)
+    private Apprenant apprenant;
 
 
     //@ManyToOne
@@ -41,15 +40,6 @@ public class Inscription {
     //private Session session;
     //public Long  getId() {
        // return id;
-   // }
-    public void setPrixCent(Integer prixCent) {
-        this.prixCent = prixCent;
-    }
-
-
-
-
-
-
+    public Inscription() {}
 
 }
