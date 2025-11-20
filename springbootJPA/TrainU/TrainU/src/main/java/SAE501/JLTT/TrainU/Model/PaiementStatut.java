@@ -1,11 +1,11 @@
 package SAE501.JLTT.TrainU.Model;
 
-/** Statut "métier" d'un paiement. */
 public enum PaiementStatut {
-    CREATED,              // créé dans ta BD, pas encore payé/confirmé
-    PAID,                 // payé (succeeded)
-    PARTIALLY_REFUNDED,   // remboursé partiellement
-    REFUNDED,             // remboursé totalement
-    CANCELED,             // annulé (PI annulé)
-    FAILED                // échec Stripe
+    CREATED,    // intent créé, pas encore payé
+    PAID,       // payé (succeeded)
+    REFUNDED,   // remboursé (total)
+    FAILED,     // refusé (ex: requires_payment_method après echec)
+    PENDING,    // en traitement Stripe (processing) ou 3DS en cours
+    CANCELED,   // annulé manuellement côté app
+    EXPIRED     // expiré automatiquement (ex: > 14 j)
 }
