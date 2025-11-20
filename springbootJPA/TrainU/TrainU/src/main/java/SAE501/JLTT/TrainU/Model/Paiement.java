@@ -23,7 +23,7 @@ public class Paiement {
     private Integer montantTotalCent;
 
     @Column(nullable = false, length = 10)
-    private String devise; // ex: "eur"
+    private String devise; // actuellement seulement "eur"
 
     @Column(name = "stripe_intent_id", unique = true)
     private String stripeIntentId; // null tant qu'on n'a pas parlé à Stripe

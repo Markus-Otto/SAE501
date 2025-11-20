@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
@@ -24,4 +26,18 @@ public class PaiementController {
     public RefundResponse refund(@PathVariable Long id, @RequestBody RefundRequest req) {
         return paiementService.refund(id, req);
     }
+
+    @GetMapping
+    public List<PaiementListItem> list() { return paiementService.list(); }
+
+    @GetMapping("/{id}")
+    public PaiementDetails details(@PathVariable Long id) { return paiementService.details(id); }
+
+    @PostMapping("/{id}/cancel")
+    public PaiementDetails cancel(@PathVariable Long id) {
+        return paiementService.cancel(id);
+    }
+
+
+
 }
