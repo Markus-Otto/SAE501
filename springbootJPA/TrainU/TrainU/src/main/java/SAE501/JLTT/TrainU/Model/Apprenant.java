@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -30,5 +32,17 @@ public class Apprenant {
     private String motDePasse;
 
     @Column(name = "ACTIVE")
-    private Boolean active = true; // par défaut actif
+    private Boolean active = true;
+
+    @OneToMany(mappedBy = "apprenant")
+    private List<Inscription> inscriptions;
+
+    @OneToMany(mappedBy = "apprenant")
+    private List<Emargement> emargements;
+
+    @OneToMany(mappedBy = "apprenantId")
+    private List<Paiement> paiements;
+
+   // @OneToMany(mappedBy = "apprenant")
+    //private List<Certificat> certificats;
 }
