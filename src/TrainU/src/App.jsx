@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import {loadStripe} from '@stripe/stripe-js';
-
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { createPayment, listPayments, cancelPayment, refundPayment } from "./api/api.js";
 
