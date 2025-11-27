@@ -51,6 +51,8 @@ public class StripePortImpl implements StripePort {
         }
     }
 
+
+
     @Override
     public void cancelPaymentIntent(String paymentIntentId) {
         try {
@@ -77,12 +79,10 @@ public class StripePortImpl implements StripePort {
 
     @Override
     public PaymentIntent retrievePaymentIntent(String paymentIntentId) {
-        try {
-            return PaymentIntent.retrieve(paymentIntentId);
-        } catch (Exception e) {
-            throw new RuntimeException("Stripe retrieve PI failed: " + e.getMessage(), e);
-        }
+        try { return PaymentIntent.retrieve(paymentIntentId); }
+        catch (Exception e) { throw new RuntimeException("Stripe retrieve PI failed: " + e.getMessage(), e); }
     }
+
 
 
 }

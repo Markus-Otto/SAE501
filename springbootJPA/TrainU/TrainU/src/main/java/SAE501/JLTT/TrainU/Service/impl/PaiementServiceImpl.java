@@ -41,7 +41,9 @@ public class PaiementServiceImpl implements PaiementService {
                 .statut(PaiementStatut.CREATED)
                 .dateCreation(Instant.now())
                 .build();
+
         paiementRepo.save(p);
+
 
         for (var l : req.lignes()) {
             ligneRepo.save(PaiementLigne.builder()
@@ -130,16 +132,11 @@ public class PaiementServiceImpl implements PaiementService {
     }
 
     /** /sync : interroge Stripe et met à jour le statut local. */
-    @Transactional
-    @Override
+    @Override @Transactional
     public PaiementDetails syncStatus(Long paiementId) {
-        var p = paiementRepo.findById(paiementId)
-                .orElseThrow(() -> new NoSuchElementException("Paiement " + paiementId + " introuvable"));
-
+        var p = paiementRepo.findById(paiementId).orElseThrow();
         var pi = stripePort.retrievePaymentIntent(p.getStripeIntentId());
-        String st = pi.getStatus(); // "succeeded", "processing", "requires_payment_method", "requires_action", ...
-
-        switch (st) {
+        switch (pi.getStatus()) {                    // "succeeded", "processing", ...
             case "succeeded" -> p.setStatut(PaiementStatut.PAID);
             case "processing" -> p.setStatut(PaiementStatut.PENDING);
             case "requires_payment_method" -> p.setStatut(PaiementStatut.FAILED);
@@ -147,14 +144,12 @@ public class PaiementServiceImpl implements PaiementService {
             default -> p.setStatut(PaiementStatut.CREATED);
         }
         paiementRepo.save(p);
-
-        var lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
-                .map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent()))
-                .toList();
-        return new PaiementDetails(
-                p.getId(), p.getApprenantId(), p.getMontantTotalCent(),
+        var lignes = ligneRepo.findByPaiement_Id(p.getId())
+                .stream().map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent())).toList();
+        return new PaiementDetails(p.getId(), p.getApprenantId(), p.getMontantTotalCent(),
                 p.getDevise(), p.getStatut(), p.getStripeIntentId(), p.getDateCreation(), lignes);
     }
+
 
     public void cancelPaymentIntent(String paymentIntentId) {
         try {
