@@ -33,3 +33,21 @@ puis remplacer dans le fichier index.css le css pas
 ```
 
 et c'est bon.
+
+
+Postman si vous avez des problèmes avec clés étrangères : 
+
+(ex postman)
+{
+  "prixCent": 25000,
+  "statut": "EN_ATTENTE",
+  "dateInscription": "2025-01-05T15:30:00",
+  "apprenant": {
+    "id": 1
+  },
+  "session": {
+    "id": 1
+  }
+}
+
+(apprenant et session considéré comme des "join table (ou column jsp)"
