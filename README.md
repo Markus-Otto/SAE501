@@ -57,15 +57,17 @@ Postman si vous avez des problèmes avec clés étrangères :
 
 
 
--- LISTE DES COMPTES DE TEST AJOUTÉS
-- ADMINISTRATEURS
+### LISTE DES COMPTES DE TEST AJOUTÉS
+# ADMINISTRATEURS
+```
 Login: admin
 Mot de passe: admin123
 
 TEST SAE :
 Login: superadmin 
 Mot de passe: SuperPass2024!
-
+```
+```
 - INTERVENANTS
 Email: intervenant1@test.com à intervenant5@test.com
 Mot de passe: intervenant123
@@ -73,7 +75,8 @@ Mot de passe: intervenant123
 TEST SAE :
 Email: marie.dupont@test.com 
 Mot de passe: MarieSecure2024!
-
+```
+```
 - APPRENANTS
 Email: apprenant1@test.com à apprenant20@test.com
 Mot de passe: apprenant123
@@ -81,3 +84,4 @@ Mot de passe: apprenant123
 TEST SAE :
 Email: lucas.martin@test.com
 Mot de passe: LucasPass2024!
+```
