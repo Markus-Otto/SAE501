@@ -1,4 +1,11 @@
 package SAE501.JLTT.TrainU.Controller.dto;
 
-public class LoginResponse {
-}
+
+
+public record LoginResponse(
+
+    Integer id,
+    String email,
+    String role,
+    String token
+) {}

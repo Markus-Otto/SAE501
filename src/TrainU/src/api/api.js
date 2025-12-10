@@ -37,3 +37,20 @@ export async function syncPayment(id) {
   if (!res.ok) throw await res.json().catch(() => new Error("syncPayment failed"));
   return res.json();
 }
+
+
+export async function login(email, password) {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!res.ok) {
+    throw new Error("Bad credentials");
+  }
+
+  return res.json();
+}

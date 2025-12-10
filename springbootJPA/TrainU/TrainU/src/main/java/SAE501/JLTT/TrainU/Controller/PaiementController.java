@@ -38,7 +38,7 @@ public class PaiementController {
         return paiementService.cancel(id);
     }
 
-    @PostMapping("/api/payments/{id}/sync")
+    @PostMapping("/{id}/sync")
     public PaiementDetails sync(@PathVariable Long id) {
         return paiementService.syncStatus(id);
     }
