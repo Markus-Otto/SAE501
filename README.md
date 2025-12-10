@@ -85,3 +85,14 @@ TEST SAE :
 Email: lucas.martin@test.com
 Mot de passe: LucasPass2024!
 ```
+
+
+
+# CB TEST STRIPE :
+
+réussi - 4242 4242 4242 4242
+Paiment 3D secure - 4000 0000 0000 3220
+Refus - fonds insufisant - 4000 0000 0000 9995
+Refus - CB volée - 4000 0000 0000 9979
+Refus - CVC incorrect - 4000 0000 0000 0101 
+
