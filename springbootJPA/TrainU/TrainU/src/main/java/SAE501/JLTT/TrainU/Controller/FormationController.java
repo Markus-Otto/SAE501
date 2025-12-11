@@ -21,6 +21,11 @@ public class FormationController {
         return service.getAll();
     }
 
+    @GetMapping("/active")
+    public List<Formation> getActiveFormations() {
+        return service.getActiveFormations();
+    }
+
     @GetMapping("/{id}")
     public Formation getOne(@PathVariable Integer id) {
         return service.getById(id);

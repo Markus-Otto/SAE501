@@ -7,7 +7,7 @@ export async function loginRequest({ email, password }) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }), // ⚠️ noms de champs EXACTS
+    body: JSON.stringify({ email, password }), // noms de champs EXACTS
   });
 
   if (!res.ok) {

@@ -19,6 +19,10 @@ public class FormationService {
         return repository.findAll();
     }
 
+    public List<Formation> getActiveFormations() {
+        return repository.findByActiveTrue();
+    }
+
     public Formation getById(Integer id) {
         return repository.findById(id).orElse(null);
     }
