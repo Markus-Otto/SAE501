@@ -8,6 +8,7 @@ import MainLayout from "./layouts/MainLayout.jsx";
 import Home from "./pages/Accueil.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import PaymentsPage from "./pages/PaymentsPage.jsx"; // ta page existante
+import Formation from "./pages/Formation.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="/login" element={<LoginPage />} />
               {/* plus tard: /register */}
               <Route path="/paiements" element={<PaymentsPage />} />
+              <Route path="/formation" element={<Formation />} />
             </Route>
           </Routes>
         </BrowserRouter>

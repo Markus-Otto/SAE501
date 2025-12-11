@@ -25,7 +25,7 @@ export default function Header() {
             Session
           </Link>
           <Link
-            to="/"
+            to="/formation"
             className="hover:text-white text-slate-300 transition"
           >
             Formation
