@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/emargement")
+@RequestMapping("/api/emargement")
 public class EmargementController {
 
     private final EmargementService service;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/formation")
+@RequestMapping("/api/formation")
 public class FormationController {
 
     private final FormationService service;
