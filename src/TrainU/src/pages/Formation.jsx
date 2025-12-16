@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { getFormations } from "../api/formation";
+import { useNavigate } from "react-router-dom";
 
 export default function Formation() {
   const [formations, setFormations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getFormations()
@@ -12,6 +14,11 @@ export default function Formation() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  // Passez l'objet formation complet au lieu de juste l'id
+  const handleVoirFormation = (formation) => {
+    navigate(`/formation/${formation.id}`, { state: { formation } });
+  };
 
   if (loading) {
     return <p className="text-slate-400">Chargement des formations…</p>;
@@ -73,8 +80,9 @@ export default function Formation() {
               <p>💰 {f.prix} €</p>
             </div>
 
-            {/* CTA */}
+            {/* CTA - Passez l'objet complet */}
             <button
+              onClick={() => handleVoirFormation(f)}
               className="mt-6 w-full rounded-xl bg-[#EB5B5B] py-2 font-semibold text-white hover:brightness-110 transition"
             >
               Voir la formation

@@ -9,6 +9,7 @@ import Home from "./pages/Accueil.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import PaymentsPage from "./pages/PaymentsPage.jsx"; // ta page existante
 import Formation from "./pages/Formation.jsx";
+import FormationDetail from "./pages/FormationDetail.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -25,6 +26,8 @@ export default function App() {
               <Route path="/paiements" element={<PaymentsPage />} />
               <Route path="/formation" element={<Formation />} />
             </Route>
+            
+          <Route path="/formation/:id" element={<FormationDetail />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
