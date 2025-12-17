@@ -2,49 +2,80 @@ package SAE501.JLTT.TrainU.Service;
 
 import SAE501.JLTT.TrainU.Controller.dto.LoginRequest;
 import SAE501.JLTT.TrainU.Controller.dto.LoginResponse;
+import SAE501.JLTT.TrainU.Model.Administrator;
 import SAE501.JLTT.TrainU.Model.Apprenant;
+import SAE501.JLTT.TrainU.Model.Intervenant;
+import SAE501.JLTT.TrainU.Repository.AdministratorRepository;
 import SAE501.JLTT.TrainU.Repository.ApprenantRepository;
+import SAE501.JLTT.TrainU.Repository.IntervenantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final ApprenantRepository apprenantRepo;
+    private final IntervenantRepository intervenantRepo;
+    private final AdministratorRepository adminRepo;
     private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest req) {
-        // 1. Chercher l'utilisateur par email
-        Apprenant apprenant = apprenantRepo.findByEmail(req.email())
-                .orElseThrow(() -> new RuntimeException("Identifiants invalides"));
 
-        // 2. Vérifier le mot de passe avec BCrypt
-        if (!passwordEncoder.matches(req.password(), apprenant.getMotDePasse())) {
-            throw new RuntimeException("Identifiants invalides");
+        String email = req.email();
+        String password = req.password();
+
+        // 🔐 1️⃣ Tentative APPRENANT
+        Apprenant apprenant = apprenantRepo.findByEmail(email).orElse(null);
+        if (apprenant != null) {
+            if (!passwordEncoder.matches(password, apprenant.getMotDePasse())) {
+                throw new RuntimeException("Identifiants invalides");
+            }
+
+            if (!apprenant.getActive()) {
+                throw new RuntimeException("Compte désactivé");
+            }
+
+            return new LoginResponse(
+                    apprenant.getId(),
+                    apprenant.getEmail(),
+                    "apprenant",
+                    "APPRENANT_" + apprenant.getId() + "_TOKEN"
+            );
         }
 
-        // 3. Vérifier si le compte est actif
-        if (!apprenant.getActive()) {
-            throw new RuntimeException("Compte désactivé");
+        // 🔐 2️⃣ Tentative INTERVENANT
+        Intervenant intervenant = intervenantRepo.findByEmail(email).orElse(null);
+        if (intervenant != null) {
+            if (!passwordEncoder.matches(password, intervenant.getMotDePasse())) {
+                throw new RuntimeException("Identifiants invalides");
+            }
+
+            return new LoginResponse(
+                    intervenant.getId(),
+                    intervenant.getEmail(),
+                    "intervenant",
+                    "INTERVENANT_" + intervenant.getId() + "_TOKEN"
+            );
         }
 
-        // 4. Générer un token (pour l'instant, un faux token simple)
-        String token = "FAKE_" + apprenant.getId() + "_TOKEN";
+        // 🔐 3️⃣ Tentative ADMIN
+        Administrator admin = adminRepo.findByLogin(email).orElse(null);
+        if (admin != null) {
+            if (!passwordEncoder.matches(password, admin.getMotDePasse())) {
+                throw new RuntimeException("Identifiants invalides");
+            }
 
-        // 5. Renvoyer la réponse
-        return new LoginResponse(
+            return new LoginResponse(
+                    admin.getId(),
+                    admin.getLogin(),
+                    "admin",
+                    "ADMIN_" + admin.getId() + "_TOKEN"
+            );
+        }
 
-                apprenant.getId(),
-                apprenant.getEmail(),
-                "USER",  // Pour l'instant, tous les apprenants sont "USER"
-                token
-
-        );
-
+        // ❌ Aucun compte trouvé
+        throw new RuntimeException("Identifiants invalides");
     }
-
 }

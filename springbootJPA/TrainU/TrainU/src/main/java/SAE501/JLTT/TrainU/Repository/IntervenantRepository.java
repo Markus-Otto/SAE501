@@ -1,6 +1,5 @@
 package SAE501.JLTT.TrainU.Repository;
 
-import SAE501.JLTT.TrainU.Model.Apprenant;
 import SAE501.JLTT.TrainU.Model.Intervenant;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -39,7 +39,7 @@ export async function syncPayment(id) {
 }
 
 
-export async function login(email, password) {
+export async function login(email, Login, password) {
   const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: {

@@ -1,17 +1,25 @@
 // auth.js
 const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8080";
 
-export async function loginRequest({ email, password }) {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+export async function loginRequest({ email, password, role }) {
+  
+  const endpoint = `${BASE}/api/auth/login`; 
+
+  const bodyData = { 
+    email, 
+    password,
+    role // ✅ Inclure le rôle dans la requête
+  };
+  
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }), // noms de champs EXACTS
+    body: JSON.stringify(bodyData), 
   });
 
   if (!res.ok) {
-    // Essaie de récupérer le message d'erreur Spring pour le debug
     let details = "";
     try {
       const data = await res.json();
@@ -22,5 +30,5 @@ export async function loginRequest({ email, password }) {
     throw new Error(details || `Login failed (${res.status})`);
   }
 
-  return res.json(); // { id, email, role, token }
+  return res.json();
 }

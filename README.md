@@ -62,6 +62,7 @@ Postman si vous avez des problèmes avec clés étrangères :
 ```
 Login: admin
 Mot de passe: admin123
+admin@test.com
 
 TEST SAE :
 Login: superadmin 
