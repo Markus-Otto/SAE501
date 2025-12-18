@@ -1,11 +1,16 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @Setter
@@ -17,14 +22,9 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "TITRE", nullable = false)
-    private String Titre;
-
-    @Column(name = "DESCRIPTION", nullable = false)
-    private String Description;
-
-    @Column(name = "CATÉGORIE", unique = true)
-    private String Categorie;
+    private String titre;
+    private String description;
+    private String categorie;
 
     @Column(name = "DATE_DEBUT")
     private LocalDateTime dateDebut;
@@ -38,12 +38,13 @@ public class Session {
     @Column(name = "NOMBRE_POSTE")
     private Integer nombrePoste;
 
-    // ✔ une session appartient à UNE formation
     @ManyToOne
     @JoinColumn(name = "ID_FORMATION", nullable = false)
+    @JsonIgnoreProperties("sessions")
     private Formation formation;
 
-    // ✔ une session possède plusieurs émargements
+    @JsonIgnore
     @OneToMany(mappedBy = "session")
     private List<Emargement> emargements;
+
 }

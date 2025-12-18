@@ -107,8 +107,12 @@ export default function FormationDetail() {
               <p className="text-slate-100 text-4xl font-bold mb-4">
                 {formation.prix}€
               </p>
-              <button className="w-full rounded-xl bg-[#EB5B5B] py-3 font-semibold text-white hover:brightness-110 transition">
-                Acheter
+              <button 
+                onClick={() => formation?.id && navigate(`/formation/${formation.id}/session`, { state: { formation } })}
+                className="w-full rounded-xl bg-[#EB5B5B] py-3 font-semibold text-white hover:brightness-110 transition"
+                disabled={!formation?.id}
+              >
+              Acheter
               </button>
             </div>
           </div>

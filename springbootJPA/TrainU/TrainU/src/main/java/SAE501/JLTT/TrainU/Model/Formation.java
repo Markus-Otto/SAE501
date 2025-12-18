@@ -1,8 +1,11 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 
 @Getter
@@ -27,4 +30,8 @@ public class Formation {
     private Integer prix;
 
     private Boolean active;
+
+    // Dans Formation.java
+    @OneToMany(mappedBy = "formation")
+    private List<Session> sessions;
 }

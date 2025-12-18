@@ -25,7 +25,7 @@ export default function LoginIntervenant() {
       }
       
       login(data);
-      navigate("/intervenant/dashboard"); // Ou votre route intervenant
+      navigate("/"); // Ou votre route intervenant
     } catch (err) {
       setError(err.message || "Erreur de connexion");
     } finally {

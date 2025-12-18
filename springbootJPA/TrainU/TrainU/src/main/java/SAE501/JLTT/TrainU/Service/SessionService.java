@@ -14,6 +14,10 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final FormationRepository formationRepository;
 
+    public List<Session> getByFormationId(Integer idFormation) {
+        return sessionRepository.findByFormationId(idFormation);
+    }
+
     public SessionService(SessionRepository sessionRepository, FormationRepository formationRepository) {
         this.sessionRepository = sessionRepository;
         this.formationRepository = formationRepository;

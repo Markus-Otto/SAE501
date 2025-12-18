@@ -24,7 +24,7 @@ export default function LoginAdmin() {
       }
       
       login(data);
-      navigate("/admin/dashboard");
+      navigate("/");
     } catch (err) {
       setError(err.message || "Erreur d'authentification");
     } finally {

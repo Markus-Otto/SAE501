@@ -75,7 +75,7 @@ public class AuthService {
             );
         }
 
-        // ❌ Aucun compte trouvé
+
         throw new RuntimeException("Identifiants invalides");
     }
 }
