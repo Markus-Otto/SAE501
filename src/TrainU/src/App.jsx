@@ -13,6 +13,8 @@ import LoginUtilisateur from "./pages/LoginUtilisateur.jsx";
 import LoginIntervenant from "./pages/LoginIntervenant";
 import LoginAdmin from "./pages/LoginAdmin";
 import SessionSelection from "./pages/SessionSelection.jsx";
+import Paiement from "./pages/paiement.jsx";
+import SignUtilisateur from "./pages/SignUtilisateur.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -32,7 +34,8 @@ export default function App() {
               <Route path="/formation" element={<Formation />} />
               <Route path="/formation/:id" element={<FormationDetail />} />
               <Route path="/formation/:id/session/" element={<SessionSelection />} />
-              
+              <Route path="/paiement" element={<Paiement />} />
+              <Route path="/signutilisateur" element={<SignUtilisateur />} />
             </Route>
           
           </Routes>

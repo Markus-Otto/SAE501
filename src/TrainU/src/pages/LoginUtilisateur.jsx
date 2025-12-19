@@ -107,7 +107,11 @@ export default function LoginUtilisateur() {
               {busy ? "..." : "→"}
             </button>
 
-            <button type="button" className="text-xs text-slate-400 hover:text-slate-200 underline">
+            <button 
+              type="button" 
+              onClick={() => window.location.href = "/signutilisateur"} 
+              className="text-xs text-slate-400 hover:text-slate-200 underline"
+            >
               Créer un compte
             </button>
           </div>

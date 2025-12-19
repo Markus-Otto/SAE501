@@ -134,7 +134,7 @@ export default function SessionSelection() {
 
             <button
               disabled={selectedSessions.length === 0}
-              onClick={() => navigate("/paiement", { state: { formation, sessions: selectedSessions } })}
+              onClick={() => navigate("/Paiement", { state: { formation, sessions: selectedSessions } })}
               className={`w-full py-4 rounded-2xl font-bold text-white transition-all ${selectedSessions.length > 0 ? "bg-[#EB5B5B] hover:brightness-110" : "bg-slate-800 text-slate-500 cursor-not-allowed"}`}
             >
               Passer au paiement ({selectedSessions.length})
