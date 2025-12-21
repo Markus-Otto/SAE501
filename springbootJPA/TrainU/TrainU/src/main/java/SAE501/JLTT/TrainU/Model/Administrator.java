@@ -19,4 +19,8 @@ public class Administrator {
 
     @Column(name = "MOT_DE_PASSE", nullable = false)
     private String motDePasse;
+
+    public String getRole() {
+        return "admin";
+    }
 }

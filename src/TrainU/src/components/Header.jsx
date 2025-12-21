@@ -17,44 +17,29 @@ export default function Header() {
         </Link>
 
         {/* Nav */}
-        <nav className="flex items-center gap-6 text-sm">
-          <Link
-            to="/"
-            className="hover:text-white text-slate-300 transition"
-          >
-            Session
-          </Link>
-          <Link
-            to="/formation"
-            className="hover:text-white text-slate-300 transition"
-          >
-            Formation
-          </Link>
+       <nav className="flex items-center gap-6 text-sm">
+  <Link to="/" className="...">Accueil</Link>
+  <Link to="/formation" className="...">Formations</Link>
 
-          {/* Espace utilisateur */}
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 hidden sm:inline">
-                Bonjour, <span className="font-semibold">{user.username}</span>
-              </span>
-              <button
-                onClick={logout}
-                className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-medium hover:bg-red-500 transition"
-              >
-                Déconnexion
-              </button>
-            </div>
-          ) : (
-            !isOnLogin && (
-              <Link
-                to="/login"
-                className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-medium hover:bg-red-500 transition"
-              >
-                Connexion
-              </Link>
-            )
-          )}
-        </nav>
+  {/* Liens dynamiques selon le rôle */}
+  {user?.role === "apprenant" && (
+    <Link to="/DashboardApprenant" className="text-red-500 font-bold">Mon Dashboard</Link>
+  )}
+  
+  {user?.role === "admin" && (
+    <Link to="/admin/dashboard" className="text-blue-500 font-bold">Gestion Admin</Link>
+  )}
+
+  {/* Espace connexion/déconnexion */}
+  {user ? (
+    <div className="flex items-center gap-3">
+       <span className="text-xs text-slate-400 italic">Compte {user.role}</span>
+       <button onClick={logout} className="...">Déconnexion</button>
+    </div>
+  ) : (
+    !isOnLogin && <Link to="/login" className="...">Connexion</Link>
+  )}
+</nav>
       </div>
     </header>
   );

@@ -43,6 +43,10 @@ public class Apprenant {
     @OneToMany(mappedBy = "apprenantId")
     private List<Paiement> paiements;
 
+    public String getRole() {
+        return "apprenant";
+    }
+
    // @OneToMany(mappedBy = "apprenant")
     //private List<Certificat> certificats;
 }

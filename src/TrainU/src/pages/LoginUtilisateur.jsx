@@ -14,26 +14,30 @@ export default function LoginUtilisateur() {
   const { pathname } = useLocation(); // ✅ Maintenant défini grâce à l'import
   const { login } = useAuth();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const data = await loginRequest({ email, password });
-      
-      // Sécurité : Vérifie que c'est bien un apprenant
-      if (data.role !== "apprenant" && data.role !== "utilisateur") {
-        throw new Error("Accès non autorisé : compte non utilisateur.");
-      }
-      
-      login(data);
-      navigate("/");
-    } catch (err) {
-      setError(err.message || "Identifiants incorrects");
-    } finally {
-      setBusy(false);
+ async function handleSubmit(e) {
+  e.preventDefault();
+  setBusy(true);
+  setError(null);
+  try {
+    const data = await loginRequest({ email, password });
+    
+    // On appelle notre fonction login formatée
+    login(data);
+
+    // Redirection basée sur le rôle reçu de l'API
+    if (data.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (data.role === "intervenant") {
+      navigate("/intervenant/dashboard");
+    } else {
+      navigate("/DashboardApprenant");
     }
+  } catch (err) {
+    setError(err.message || "Identifiants incorrects");
+  } finally {
+    setBusy(false);
   }
+}
 
   const buttonClass = (active) =>
     `rounded-full px-6 py-2 text-sm font-semibold transition shadow

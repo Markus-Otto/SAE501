@@ -22,59 +22,36 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest req) {
-
         String email = req.email();
         String password = req.password();
 
-        // 🔐 1️⃣ Tentative APPRENANT
-        Apprenant apprenant = apprenantRepo.findByEmail(email).orElse(null);
-        if (apprenant != null) {
-            if (!passwordEncoder.matches(password, apprenant.getMotDePasse())) {
-                throw new RuntimeException("Identifiants invalides");
+        // 1. Test APPRENANT (cherche par Email)
+        var apprenantOpt = apprenantRepo.findByEmail(email);
+        if (apprenantOpt.isPresent()) {
+            Apprenant a = apprenantOpt.get();
+            if (passwordEncoder.matches(password, a.getMotDePasse())) {
+                if (!a.getActive()) throw new RuntimeException("Compte désactivé");
+                return new LoginResponse(a.getId(), a.getEmail(), "apprenant", "TOKEN_APP_" + a.getId());
             }
-
-            if (!apprenant.getActive()) {
-                throw new RuntimeException("Compte désactivé");
-            }
-
-            return new LoginResponse(
-                    apprenant.getId(),
-                    apprenant.getEmail(),
-                    "apprenant",
-                    "APPRENANT_" + apprenant.getId() + "_TOKEN"
-            );
         }
 
-        // 🔐 2️⃣ Tentative INTERVENANT
-        Intervenant intervenant = intervenantRepo.findByEmail(email).orElse(null);
-        if (intervenant != null) {
-            if (!passwordEncoder.matches(password, intervenant.getMotDePasse())) {
-                throw new RuntimeException("Identifiants invalides");
+        // 2. Test INTERVENANT (cherche par Email)
+        var intervenantOpt = intervenantRepo.findByEmail(email);
+        if (intervenantOpt.isPresent()) {
+            Intervenant i = intervenantOpt.get();
+            if (passwordEncoder.matches(password, i.getMotDePasse())) {
+                return new LoginResponse(i.getId(), i.getEmail(), "intervenant", "TOKEN_INT_" + i.getId());
             }
-
-            return new LoginResponse(
-                    intervenant.getId(),
-                    intervenant.getEmail(),
-                    "intervenant",
-                    "INTERVENANT_" + intervenant.getId() + "_TOKEN"
-            );
         }
 
-        // 🔐 3️⃣ Tentative ADMIN
-        Administrator admin = adminRepo.findByLogin(email).orElse(null);
-        if (admin != null) {
-            if (!passwordEncoder.matches(password, admin.getMotDePasse())) {
-                throw new RuntimeException("Identifiants invalides");
+        // 3. Test ADMIN (cherche par Login)
+        var adminOpt = adminRepo.findByLogin(email);
+        if (adminOpt.isPresent()) {
+            Administrator adm = adminOpt.get();
+            if (passwordEncoder.matches(password, adm.getMotDePasse())) {
+                return new LoginResponse(adm.getId(), adm.getLogin(), "admin", "TOKEN_ADM_" + adm.getId());
             }
-
-            return new LoginResponse(
-                    admin.getId(),
-                    admin.getLogin(),
-                    "admin",
-                    "ADMIN_" + admin.getId() + "_TOKEN"
-            );
         }
-
 
         throw new RuntimeException("Identifiants invalides");
     }

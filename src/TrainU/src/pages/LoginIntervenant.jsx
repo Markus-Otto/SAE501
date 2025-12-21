@@ -12,26 +12,32 @@ export default function LoginIntervenant() {
   const { pathname } = useLocation();
   const { login } = useAuth();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError(null);
-    setBusy(true);
-    try {
-      const data = await loginRequest({ email, password, role: "intervenant" });
-      
-      // Sécurité : Vérifie si le rôle retourné est bien celui attendu
-      if (data.role !== "intervenant") {
-        throw new Error("Accès réservé aux intervenants");
-      }
-      
-      login(data);
-      navigate("/"); // Ou votre route intervenant
-    } catch (err) {
-      setError(err.message || "Erreur de connexion");
-    } finally {
-      setBusy(false);
+ async function handleSubmit(e) {
+  e.preventDefault();
+  setError(null);
+  setBusy(true);
+  try {
+    const data = await loginRequest({ email, password, role: "intervenant" });
+    
+    // 🔍 DEBUG : Ajoute ce log pour voir exactement ce que Java envoie
+    console.log("Réponse API:", data);
+
+    // Vérification de sécurité sur l'objet plat renvoyé par Java
+    if (!data || data.role !== "intervenant") {
+      throw new Error("Accès réservé aux intervenants");
     }
+    
+    // On envoie l'objet plat au context qui va s'occuper de le formater
+    login(data);
+    
+    // Redirection
+    navigate("/intervenant/dashboard"); 
+  } catch (err) {
+    setError(err.message || "Erreur de connexion");
+  } finally {
+    setBusy(false);
   }
+}
 
   const buttonClass = (active) =>
     `rounded-full px-6 py-2 text-sm font-semibold transition

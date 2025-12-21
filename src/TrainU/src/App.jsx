@@ -4,9 +4,10 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import { AuthProvider } from "./context/AuthContext.jsx";
 import MainLayout from "./layouts/MainLayout.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx"; // L'import du fichier créé ci-dessus
 
+// Pages
 import Home from "./pages/Accueil.jsx";
-import PaymentsPage from "./pages/PaymentsPage.jsx"; // ta page existante
 import Formation from "./pages/Formation.jsx";
 import FormationDetail from "./pages/FormationDetail.jsx";
 import LoginUtilisateur from "./pages/LoginUtilisateur.jsx";
@@ -15,6 +16,7 @@ import LoginAdmin from "./pages/LoginAdmin";
 import SessionSelection from "./pages/SessionSelection.jsx";
 import Paiement from "./pages/paiement.jsx";
 import SignUtilisateur from "./pages/SignUtilisateur.jsx";
+import DashboardApprenant from "./pages/Dashboardapp.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -25,19 +27,37 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route element={<MainLayout />}>
+              {/* --- ROUTES PUBLIQUES --- */}
               <Route index element={<Home />} />
               <Route path="/login" element={<LoginUtilisateur />} />
               <Route path="/intervenant/login" element={<LoginIntervenant />} />
               <Route path="/admin/login" element={<LoginAdmin />} />
-              {/* plus tard: /register */}
-              <Route path="/paiements" element={<PaymentsPage />} />
               <Route path="/formation" element={<Formation />} />
               <Route path="/formation/:id" element={<FormationDetail />} />
-              <Route path="/formation/:id/session/" element={<SessionSelection />} />
-              <Route path="/paiement" element={<Paiement />} />
               <Route path="/signutilisateur" element={<SignUtilisateur />} />
+
+              {/* --- ROUTES PROTÉGÉES : APPRENANT --- */}
+              <Route element={<ProtectedRoute allowedRoles={["apprenant", "utilisateur"]} />}>
+                <Route path="/DashboardApprenant" element={<DashboardApprenant />} />
+              </Route>
+              
+              <Route element={<ProtectedRoute allowedRoles={["apprenant", "utilisateur", "admin"]} />}>
+                <Route path="/formation/:id/session/" element={<SessionSelection />} />
+                <Route path="/paiement" element={<Paiement />} />
+                {/* L'admin peut maintenant entrer ici */}
+              </Route>
+
+              {/* --- ROUTES PROTÉGÉES : ADMIN --- */}
+              <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+                <Route path="/admin/dashboard" element={<div>Dashboard Admin (A créer)</div>} />
+              </Route>
+
+              {/* --- ROUTES PROTÉGÉES : INTERVENANT --- */}
+              <Route element={<ProtectedRoute allowedRoles={["intervenant"]} />}>
+                <Route path="/intervenant/dashboard" element={<div>Dashboard Intervenant (A créer)</div>} />
+              </Route>
+
             </Route>
-          
           </Routes>
         </BrowserRouter>
       </AuthProvider>

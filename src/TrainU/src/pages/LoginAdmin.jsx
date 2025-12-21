@@ -13,24 +13,29 @@ export default function LoginAdmin() {
   const { login } = useAuth();
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setError(null);
-    setBusy(true);
-    try {
-      const data = await loginRequest({ email, password, role: "admin" });
-      
-      if (data.role !== "admin") {
-        throw new Error("Accès strictement réservé à l'administration");
-      }
-      
-      login(data);
-      navigate("/");
-    } catch (err) {
-      setError(err.message || "Erreur d'authentification");
-    } finally {
-      setBusy(false);
+  e.preventDefault();
+  setBusy(true);
+  setError(null);
+  try {
+    const data = await loginRequest({ email, password });
+    
+    // On appelle notre fonction login formatée
+    login(data);
+
+    // Redirection basée sur le rôle reçu de l'API
+    if (data.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (data.role === "intervenant") {
+      navigate("/intervenant/dashboard");
+    } else {
+      navigate("/DashboardApprenant");
     }
+  } catch (err) {
+    setError(err.message || "Identifiants incorrects");
+  } finally {
+    setBusy(false);
   }
+}
 
   const buttonClass = (active) =>
     `rounded-full px-6 py-2 text-sm font-semibold transition

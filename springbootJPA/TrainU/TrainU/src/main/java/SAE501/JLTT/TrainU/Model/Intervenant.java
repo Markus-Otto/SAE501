@@ -31,4 +31,8 @@ public class Intervenant {
 
     @Column(name = "ACTIVE")
     private Boolean active = true; // par défaut actif
+    // Ajoutez ceci dans la classe
+    public String getRole() {
+        return "intervenant";
+    }
 }
