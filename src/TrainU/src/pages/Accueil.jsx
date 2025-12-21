@@ -28,7 +28,7 @@ export default function Accueil() {
 
           <div className="mt-10 flex justify-center gap-4">
             <Link
-              to="/connexion"
+              to="/login"
               className="rounded-full bg-slate-900 px-8 py-3 font-semibold shadow-lg hover:bg-slate-800 transition"
             >
               Rejoignez-nous
@@ -99,7 +99,7 @@ export default function Accueil() {
           Créez votre compte et accédez à l’ensemble des formations TrainU.
         </p>
         <Link
-          to="/connexion"
+          to="/signutilisateur"
           className="inline-block rounded-full bg-[#EB5B5B] px-10 py-3 font-semibold text-white shadow-lg hover:brightness-110 transition"
         >
           Commencer maintenant
