@@ -4,7 +4,6 @@ import SAE501.JLTT.TrainU.Controller.dto.*;
 import SAE501.JLTT.TrainU.Model.Paiement;
 import SAE501.JLTT.TrainU.Model.PaiementLigne;
 import SAE501.JLTT.TrainU.Model.PaiementStatut;
-import SAE501.JLTT.TrainU.Model.Remboursement;
 import SAE501.JLTT.TrainU.Repository.PaiementLigneRepository;
 import SAE501.JLTT.TrainU.Repository.PaiementRepository;
 import SAE501.JLTT.TrainU.Repository.RemboursementRepository;
@@ -28,14 +27,82 @@ public class PaiementServiceImpl implements PaiementService {
     private final StripePort stripePort;
     private final RemboursementRepository remboursementRepo;
 
-    /** Création : on reste en CREATED et on ne met PAS PAID tout de suite. */
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaiementListItem> getByApprenantId(Integer idApprenant) {
+        // ✅ Correction : Conversion explicite de Integer vers Long
+        Long idLong = (idApprenant != null) ? idApprenant.longValue() : 0L;
+
+        return paiementRepo.findByApprenantId(idLong)
+                .stream()
+                .map(this::mapToListItem)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaiementListItem> list() {
+        return paiementRepo.findAll(org.springframework.data.domain.Sort.by("id").descending())
+                .stream()
+                .map(this::mapToListItem)
+                .toList();
+    }
+
+    private PaiementListItem mapToListItem(Paiement p) {
+        // ✅ On s'assure que si le DTO attend un Integer, on convertit le Long du modèle
+        Integer apprenantIdFinal = 0;
+        if (p.getApprenantId() != null) {
+            apprenantIdFinal = p.getApprenantId().intValue();
+        }
+
+        return new PaiementListItem(
+                p.getId(),
+                apprenantIdFinal,
+                p.getMontantTotalCent(),
+                p.getDevise(),
+                p.getStatut(),
+                p.getStripeIntentId(),
+                p.getDateCreation()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaiementDetails details(Long id) {
+        Paiement p = paiementRepo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Paiement non trouvé : " + id));
+
+        var lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
+                .map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent()))
+                .toList();
+
+        Integer apprenantIdFinal = 0;
+        if (p.getApprenantId() != null) {
+            apprenantIdFinal = p.getApprenantId().intValue();
+        }
+
+        return new PaiementDetails(
+                p.getId(),
+                apprenantIdFinal,
+                p.getMontantTotalCent(),
+                p.getDevise(),
+                p.getStatut(),
+                p.getStripeIntentId(),
+                p.getDateCreation(),
+                lignes);
+    }
+
     @Transactional
     @Override
     public CreatePaymentResponse createPayment(CreatePaymentRequest req) {
         int total = req.lignes().stream().mapToInt(CreatePaymentRequest.Ligne::montantCent).sum();
 
+        // ✅ Correction cruciale : Conversion explicite vers Long
+        // On utilise longValue() pour extraire la valeur si req.apprenantId() est un Integer
+        Long appId = (req.apprenantId() != null) ? req.apprenantId().longValue() : 0L;
+
         Paiement p = Paiement.builder()
-                .apprenantId(req.apprenantId())
+                .apprenantId(appId)
                 .montantTotalCent(total)
                 .devise("eur")
                 .statut(PaiementStatut.CREATED)
@@ -43,7 +110,6 @@ public class PaiementServiceImpl implements PaiementService {
                 .build();
 
         paiementRepo.save(p);
-
 
         for (var l : req.lignes()) {
             ligneRepo.save(PaiementLigne.builder()
@@ -59,130 +125,72 @@ public class PaiementServiceImpl implements PaiementService {
         );
 
         String res = stripePort.createPaymentIntent(total, "eur", req.email(), metadata, "pay_" + p.getId());
-        String[] parts = res.split(":"); // 0=pi_xxx, 1=clientSecret
+        String[] parts = res.split(":");
 
-        p.setStripeIntentId(parts[0]); // on n’active pas PAID ici
+        p.setStripeIntentId(parts[0]);
         paiementRepo.save(p);
 
         return new CreatePaymentResponse(
-                p.getId(), parts[0], parts[1],
-                Integer.valueOf(total), "eur", p.getStatut().name()
+                p.getId(),
+                parts[0],
+                parts[1],
+                total,
+                "eur",
+                p.getStatut().name()
         );
     }
 
-    /** Refund total uniquement (simplifié). */
+    @Override
     @Transactional
-    @Override
-    public RefundResponse refund(Long paiementId, RefundRequest req) {
-        var paiement = paiementRepo.findById(paiementId)
-                .orElseThrow(() -> new NoSuchElementException("Paiement " + paiementId + " introuvable"));
-
-        if (paiement.getStatut() == PaiementStatut.REFUNDED) {
-            throw new IllegalStateException("Paiement déjà remboursé");
-        }
-
-        int amountTotal = paiement.getMontantTotalCent();
-
-        var meta = new java.util.HashMap<String, String>();
-        meta.put("paiementId", String.valueOf(paiementId));
-        if (req.motif() != null) meta.put("motif", req.motif());
-
-        String rr = stripePort.createRefundByPaymentIntent(
-                paiement.getStripeIntentId(), null, meta // null => full refund
-        );
-        String[] parts = rr.split(":"); // 0=re_xxx, 1=status
-
-        paiement.setStatut(PaiementStatut.REFUNDED);
-        paiementRepo.save(paiement);
-
-        Remboursement r = Remboursement.builder()
-                .paiement(paiement)
-                .montantCent(amountTotal)
-                .motif(req.motif())
-                .noteInterne(req.noteInterne())
-                .stripeRefundId(parts[0])
-                .transactionStripe(null)
-                .statutAfter(PaiementStatut.REFUNDED)
-                .build();
-        remboursementRepo.save(r);
-
-        return new RefundResponse(r.getId(), parts[0], parts[1], paiement.getStatut().name());
-    }
-
-    @Override
-    public List<PaiementListItem> list() {
-        return paiementRepo.findAll(org.springframework.data.domain.Sort.by("id").descending())
-                .stream()
-                .map(p -> new PaiementListItem(
-                        p.getId(), p.getApprenantId(), p.getMontantTotalCent(),
-                        p.getDevise(), p.getStatut(), p.getStripeIntentId(), p.getDateCreation()))
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public PaiementDetails details(Long id) {
-        var p = paiementRepo.findById(id).orElseThrow();
-        var lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
-                .map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent()))
-                .toList();
-        return new PaiementDetails(
-                p.getId(), p.getApprenantId(), p.getMontantTotalCent(),
-                p.getDevise(), p.getStatut(), p.getStripeIntentId(), p.getDateCreation(), lignes);
-    }
-
-    /** /sync : interroge Stripe et met à jour le statut local. */
-    @Override @Transactional
     public PaiementDetails syncStatus(Long paiementId) {
-        var p = paiementRepo.findById(paiementId).orElseThrow();
+        Paiement p = paiementRepo.findById(paiementId).orElseThrow();
         var pi = stripePort.retrievePaymentIntent(p.getStripeIntentId());
-        switch (pi.getStatus()) {                    // "succeeded", "processing", ...
+
+        switch (pi.getStatus()) {
             case "succeeded" -> p.setStatut(PaiementStatut.PAID);
             case "processing" -> p.setStatut(PaiementStatut.PENDING);
             case "requires_payment_method" -> p.setStatut(PaiementStatut.FAILED);
             case "requires_action" -> p.setStatut(PaiementStatut.CREATED);
+            case "canceled" -> p.setStatut(PaiementStatut.CANCELED);
             default -> p.setStatut(PaiementStatut.CREATED);
         }
+
         paiementRepo.save(p);
-        var lignes = ligneRepo.findByPaiement_Id(p.getId())
-                .stream().map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent())).toList();
-        return new PaiementDetails(p.getId(), p.getApprenantId(), p.getMontantTotalCent(),
-                p.getDevise(), p.getStatut(), p.getStripeIntentId(), p.getDateCreation(), lignes);
-    }
-
-
-    public void cancelPaymentIntent(String paymentIntentId) {
-        try {
-            com.stripe.model.PaymentIntent.retrieve(paymentIntentId).cancel();
-        } catch (Exception e) {
-            throw new RuntimeException("Stripe cancel PI failed: " + e.getMessage(), e);
-        }
-    }
-
-
-    @Override
-    @org.springframework.transaction.annotation.Transactional
-    public PaiementDetails cancel(Long paiementId) {
-        var p = paiementRepo.findById(paiementId).orElseThrow();
-
-        // si déjà finalisé on refuse l’annulation
-        if (p.getStatut() == PaiementStatut.PAID || p.getStatut() == PaiementStatut.REFUNDED) {
-            throw new IllegalStateException("Paiement déjà finalisé");
-        }
-
-        // annuler l'Intent côté Stripe si possible
-        if (p.getStripeIntentId() != null) {
-            try {
-                stripePort.cancelPaymentIntent(p.getStripeIntentId());
-            } catch (RuntimeException ignore) {
-                // on évite de bloquer si Stripe renvoie déjà 'canceled' etc.
-            }
-        }
-
-        p.setStatut(PaiementStatut.CANCELED);
-        paiementRepo.save(p);
-
         return details(p.getId());
     }
 
+    @Override
+    @Transactional
+    public PaiementDetails cancel(Long paiementId) {
+        Paiement p = paiementRepo.findById(paiementId).orElseThrow();
+        if (p.getStatut() == PaiementStatut.PAID || p.getStatut() == PaiementStatut.REFUNDED) {
+            throw new IllegalStateException("Impossible d'annuler un paiement déjà finalisé.");
+        }
+        if (p.getStripeIntentId() != null) {
+            try {
+                stripePort.cancelPaymentIntent(p.getStripeIntentId());
+            } catch (RuntimeException ignore) {}
+        }
+        p.setStatut(PaiementStatut.CANCELED);
+        paiementRepo.save(p);
+        return details(p.getId());
+    }
+
+    @Transactional
+    @Override
+    public RefundResponse refund(Long paiementId, RefundRequest req) {
+        Paiement paiement = paiementRepo.findById(paiementId).orElseThrow();
+        if (paiement.getStatut() != PaiementStatut.PAID) {
+            throw new IllegalStateException("Seuls les paiements 'PAID' peuvent être remboursés.");
+        }
+        String rr = stripePort.createRefundByPaymentIntent(
+                paiement.getStripeIntentId(),
+                null,
+                Map.of("paiementId", String.valueOf(paiementId))
+        );
+        String[] parts = rr.split(":");
+        paiement.setStatut(PaiementStatut.REFUNDED);
+        paiementRepo.save(paiement);
+        return new RefundResponse(null, parts[0], parts[1], paiement.getStatut().name());
+    }
 }

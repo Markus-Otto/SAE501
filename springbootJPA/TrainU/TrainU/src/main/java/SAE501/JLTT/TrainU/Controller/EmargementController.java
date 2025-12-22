@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/emargement")
+@CrossOrigin(origins = "*") // Nécessaire pour que React puisse communiquer avec Java
 public class EmargementController {
 
     private final EmargementService service;
@@ -19,6 +20,12 @@ public class EmargementController {
     @GetMapping
     public List<Emargement> getAll() {
         return service.getAll();
+    }
+
+    // ✅ CORRECTION : Utilisation de l'instance "service" et de la bonne méthode
+    @GetMapping("/apprenant/{idApprenant}")
+    public List<Emargement> getByApprenant(@PathVariable Integer idApprenant) {
+        return service.getByApprenant(idApprenant);
     }
 
     @PostMapping

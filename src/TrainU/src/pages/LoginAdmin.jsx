@@ -15,23 +15,13 @@ export default function LoginAdmin() {
   async function handleSubmit(e) {
   e.preventDefault();
   setBusy(true);
-  setError(null);
   try {
-    const data = await loginRequest({ email, password });
-    
-    // On appelle notre fonction login formatée
+    // ✅ On précise que c'est une tentative de login ADMIN
+    const data = await loginRequest({ email, password, role: "admin" });
     login(data);
-
-    // Redirection basée sur le rôle reçu de l'API
-    if (data.role === "admin") {
-      navigate("/admin/dashboard");
-    } else if (data.role === "intervenant") {
-      navigate("/intervenant/dashboard");
-    } else {
-      navigate("/DashboardApprenant");
-    }
+    navigate("/admin/dashboard");
   } catch (err) {
-    setError(err.message || "Identifiants incorrects");
+    setError(err.message);
   } finally {
     setBusy(false);
   }

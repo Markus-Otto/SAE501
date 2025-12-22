@@ -3,18 +3,22 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { createPayment, syncPayment } from "../api/api.js";
+import { useAuth } from "../context/AuthContext.jsx"; // ✅ Importé
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
 function PaymentForm({ formation, sessions, onBack }) {
   const stripe = useStripe();
   const elements = useElements();
+  const { user } = useAuth(); // ✅ On récupère l'user connecté
   
   const [cardholderName, setCardholderName] = useState("");
-  const [email, setEmail] = useState("");
-  const [apprenantId] = useState(1);
+  const [email, setEmail] = useState(user?.email || ""); 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+
+  // ✅ L'ID est maintenant celui de l'utilisateur (ex: 21)
+  const apprenantId = user?.id; 
 
   const total = useMemo(() => formation.prix * sessions.length, [formation, sessions]);
 
@@ -28,28 +32,26 @@ function PaymentForm({ formation, sessions, onBack }) {
       setBusy(true);
       setError(null);
 
-      // Préparer les lignes de paiement selon votre structure BD
       const lignes = sessions.map(session => ({
-        inscriptionId: session.id,  // id_inscription dans PAIEMENT_LIGNE
-        montantCent: formation.prix * 100  // montant_cent dans PAIEMENT_LIGNE
+        inscriptionId: session.id,
+        montantCent: formation.prix * 100 
       }));
 
-      // 1️⃣ Créer le paiement via votre API (crée PAIEMENT + PAIEMENT_LIGNE)
+      // ✅ Envoi de l'ID dynamique au backend
       const paymentData = await createPayment({
-        apprenantId,  // ID_APPRENANT dans PAIEMENT
-        email: email || "test@example.com",
-        lignes  // Crée les PAIEMENT_LIGNE avec id_inscription et montant_cent
+        apprenantId,  
+        email: email || user?.email,
+        lignes  
       });
 
-      // 2️⃣ Confirmer le paiement avec Stripe
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+      const { error: stripeError } = await stripe.confirmCardPayment(
         paymentData.clientSecret,
         {
           payment_method: {
             card: elements.getElement(CardElement),
             billing_details: {
               name: cardholderName,
-              email: email || "test@example.com"
+              email: email || user?.email
             }
           }
         }
@@ -60,22 +62,16 @@ function PaymentForm({ formation, sessions, onBack }) {
         return;
       }
 
-      // 3️⃣ Synchroniser la base de données (met à jour le statut du PAIEMENT)
       await syncPayment(paymentData.paiementId);
-
       alert("Paiement réussi !");
-      elements.getElement(CardElement)?.clear();
-      setCardholderName("");
-      setEmail("");
+      onBack();
       
     } catch (err) {
-      setError(err.message || "Une erreur est survenue lors du paiement");
-      console.error(err);
+      setError(err.message || "Erreur lors du paiement");
     } finally {
       setBusy(false);
     }
   };
-
   return (
       <div className="max-w-7xl mx-auto">
         <button 

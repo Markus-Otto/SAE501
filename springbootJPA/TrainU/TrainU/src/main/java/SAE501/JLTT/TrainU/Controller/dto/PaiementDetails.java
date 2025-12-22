@@ -7,7 +7,7 @@ import java.util.List;
 
 public record PaiementDetails(
         Long id,
-        Long apprenantId,
+        Integer apprenantId,
         Integer montantTotalCent,
         String devise,
         PaiementStatut statut,

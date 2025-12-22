@@ -40,6 +40,7 @@ public class SessionController {
         return service.create(s, idFormation);
     }
 
+
     @PutMapping("/{id}")
     public Session update(@PathVariable Integer id, @RequestBody Session s) {
         return service.update(id, s);

@@ -24,35 +24,65 @@ public class AuthService {
     public LoginResponse login(LoginRequest req) {
         String email = req.email();
         String password = req.password();
+        String requestedRole = req.role();
 
-        // 1. Test APPRENANT (cherche par Email)
-        var apprenantOpt = apprenantRepo.findByEmail(email);
-        if (apprenantOpt.isPresent()) {
-            Apprenant a = apprenantOpt.get();
-            if (passwordEncoder.matches(password, a.getMotDePasse())) {
+        switch (requestedRole.toLowerCase()) { // Utilisation de toLowerCase pour être robuste
+            case "apprenant":
+                Apprenant a = apprenantRepo.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("Compte Apprenant introuvable"));
+
+                if (!passwordEncoder.matches(password, a.getMotDePasse()))
+                    throw new RuntimeException("Mot de passe incorrect");
+
                 if (!a.getActive()) throw new RuntimeException("Compte désactivé");
-                return new LoginResponse(a.getId(), a.getEmail(), "apprenant", "TOKEN_APP_" + a.getId());
-            }
-        }
 
-        // 2. Test INTERVENANT (cherche par Email)
-        var intervenantOpt = intervenantRepo.findByEmail(email);
-        if (intervenantOpt.isPresent()) {
-            Intervenant i = intervenantOpt.get();
-            if (passwordEncoder.matches(password, i.getMotDePasse())) {
-                return new LoginResponse(i.getId(), i.getEmail(), "intervenant", "TOKEN_INT_" + i.getId());
-            }
-        }
+                // On s'assure que l'ID est converti en Integer si nécessaire
+                return new LoginResponse(
+                        a.getId().intValue(),
+                        a.getEmail(),
+                        a.getNom(),
+                        a.getPrenom(),
+                        "apprenant",
+                        "TOKEN_APP_" + a.getId()
+                );
 
-        // 3. Test ADMIN (cherche par Login)
-        var adminOpt = adminRepo.findByLogin(email);
-        if (adminOpt.isPresent()) {
-            Administrator adm = adminOpt.get();
-            if (passwordEncoder.matches(password, adm.getMotDePasse())) {
-                return new LoginResponse(adm.getId(), adm.getLogin(), "admin", "TOKEN_ADM_" + adm.getId());
-            }
-        }
+            case "intervenant":
+                Intervenant i = intervenantRepo.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("Compte Intervenant introuvable"));
 
-        throw new RuntimeException("Identifiants invalides");
+                if (!passwordEncoder.matches(password, i.getMotDePasse()))
+                    throw new RuntimeException("Mot de passe incorrect");
+
+                return new LoginResponse(
+                        i.getId().intValue(),
+                        i.getEmail(),
+                        i.getNom(),
+                        i.getPrenom(),
+                        "intervenant",
+                        "TOKEN_INT_" + i.getId()
+                );
+
+            case "admin":
+                Administrator adm = adminRepo.findByLogin(email)
+                        .orElseThrow(() -> new RuntimeException("Compte Administrateur introuvable"));
+
+                if (!passwordEncoder.matches(password, adm.getMotDePasse()))
+                    throw new RuntimeException("Mot de passe incorrect");
+
+                // ✅ Correction : Conversion de l'ID Long vers Integer
+                Integer adminId = (adm.getId() != null) ? adm.getId().intValue() : 0;
+
+                return new LoginResponse(
+                        adminId,
+                        adm.getLogin(),
+                        "Admin",
+                        "User",
+                        "admin",
+                        "TOKEN_ADM_" + adm.getId()
+                );
+
+            default:
+                throw new RuntimeException("Rôle inconnu : " + requestedRole);
+        }
     }
 }

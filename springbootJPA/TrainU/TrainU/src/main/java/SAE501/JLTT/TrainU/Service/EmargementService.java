@@ -23,6 +23,11 @@ public class EmargementService {
         this.apprenantRepository = ar;
     }
 
+
+    public List<Emargement> getByApprenant(Integer idApprenant) {
+        return emargementRepository.findByApprenantId(idApprenant);
+    }
+
     public List<Emargement> getAll() {
         return emargementRepository.findAll();
     }

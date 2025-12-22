@@ -1,6 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore; // 👈 AJOUTE CET IMPORT
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "ÉMARGEMENT")
+@Table(name = "`émargement`")
 public class Emargement {
 
     @Id
@@ -17,17 +17,13 @@ public class Emargement {
 
     private Boolean present;
 
-    // ✔ lien vers session
-    // Relation avec Session (À CORRIGER ICI)
     @ManyToOne
     @JoinColumn(name = "id_session")
     private Session session;
 
-    // ✔ lien vers apprenant
+    // ✅ CORRECTION : Ajout de @JsonIgnore pour stopper la boucle infinie
     @ManyToOne
     @JoinColumn(name = "ID_APPRENANT")
+    @JsonIgnore
     private Apprenant apprenant;
-
-
-
 }

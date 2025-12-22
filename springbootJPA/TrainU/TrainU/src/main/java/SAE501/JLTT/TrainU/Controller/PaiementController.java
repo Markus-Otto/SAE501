@@ -11,17 +11,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class PaiementController {
 
     private final PaiementService paiementService;
 
-    // POST /api/payments
     @PostMapping
     public CreatePaymentResponse create(@Valid @RequestBody CreatePaymentRequest req) {
         return paiementService.createPayment(req);
     }
 
-    // POST /api/payments/{id}/refunds
+    // ✅ CORRECTION : Récupération des paiements
+    @GetMapping("/apprenant/{idApprenant}")
+    public List<PaiementListItem> getByApprenant(@PathVariable Integer idApprenant) {
+        return paiementService.getByApprenantId(idApprenant);
+    }
+
     @PostMapping("/{id}/refunds")
     public RefundResponse refund(@PathVariable Long id, @RequestBody RefundRequest req) {
         return paiementService.refund(id, req);
@@ -42,7 +47,4 @@ public class PaiementController {
     public PaiementDetails sync(@PathVariable Long id) {
         return paiementService.syncStatus(id);
     }
-
-
-
 }

@@ -6,7 +6,7 @@ import java.time.Instant;
 
 public record PaiementListItem(
         Long id,
-        Long apprenantId,
+        Integer apprenantId, // Change Integer en Long ici
         Integer montantTotalCent,
         String devise,
         PaiementStatut statut,

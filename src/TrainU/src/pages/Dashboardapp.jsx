@@ -1,75 +1,68 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function DashboardApprenant() {
-  const [apprenant, setApprenant] = useState({ nom: "Joris", prenom: "Dupont" });
+  const { user } = useAuth();
   const [certificats, setCertificats] = useState([]);
   const [presences, setPresences] = useState([]);
   const [achats, setAchats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("achats");
+  
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (user?.id) {
+      loadData();
+    }
+  }, [user]);
 
   async function loadData() {
+    setLoading(true);
+    const id = user.id;
+
+    const urls = [
+      `http://localhost:8080/api/certificats/apprenant/${id}`,
+      `http://localhost:8080/api/emargement/apprenant/${id}`,
+      `http://localhost:8080/api/payments/apprenant/${id}`
+    ];
+
     try {
-      setLoading(true);
-      
-      // Remplacez 1 par l'ID de l'apprenant connecté
-      const apprenantId = 1;
+      const results = await Promise.allSettled(urls.map(url => fetch(url)));
 
-      // Charger les certificats
-      const certRes = await fetch(`http://localhost:8080/api/certificat/apprenant/${apprenantId}`);
-      if (certRes.ok) {
-        const certData = await certRes.json();
-        setCertificats(certData);
+      // 1. Traitement des Certificats
+      if (results[0].status === "fulfilled" && results[0].value.ok) {
+        const data = await results[0].value.json();
+        setCertificats(data);
       }
 
-      // Charger les présences (émargements)
-      const presRes = await fetch(`http://localhost:8080/api/emargement/apprenant/${apprenantId}`);
-      if (presRes.ok) {
-        const presData = await presRes.json();
-        setPresences(presData);
+      // 2. Traitement des Présences
+      if (results[1].status === "fulfilled" && results[1].value.ok) {
+        const data = await results[1].value.json();
+        setPresences(data);
       }
 
-      // Charger les achats (paiements)
-      const achatRes = await fetch(`http://localhost:8080/api/payments/apprenant/${apprenantId}`);
-      if (achatRes.ok) {
-        const achatData = await achatRes.json();
-        setAchats(achatData);
+      // 3. Traitement des Paiements
+      if (results[2].status === "fulfilled" && results[2].value.ok) {
+        const data = await results[2].value.json();
+        setAchats(data);
       }
 
     } catch (error) {
-      console.error("Erreur lors du chargement des données:", error);
+      // On garde uniquement l'erreur critique en cas de crash total
     } finally {
       setLoading(false);
     }
   }
 
-  const downloadCertificat = async (certificatId) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/certificat/${certificatId}/download`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `certificat_${certificatId}.pdf`;
-        a.click();
-      }
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <p className="text-xl">Chargement...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+        <span className="ml-4 text-xl font-medium">Chargement de votre espace...</span>
       </div>
     );
   }
+  console.log("Données utilisateur actuelles :", user);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6">
@@ -78,85 +71,54 @@ export default function DashboardApprenant() {
         {/* En-tête */}
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">
-            Bienvenue, {apprenant.prenom}
+            Bienvenue, <span className="text-red-600">{user?.prenom} {user?.nom}</span>
           </h1>
         </div>
 
-        {/* Navigation tabs */}
+        {/* Navigation */}
         <div className="flex justify-center gap-4 mb-8">
           <button
             onClick={() => setActiveTab("achats")}
-            className={`px-6 py-3 rounded-xl font-semibold transition ${
-              activeTab === "achats"
-                ? "bg-red-600 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              activeTab === "achats" ? "bg-red-600 text-white shadow-lg shadow-red-900/20" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
             }`}
           >
-            Vos achats passés
+            Historique Achats
           </button>
           <button
-            onClick={() => setActiveTab("certificats")}
-            className={`px-6 py-3 rounded-xl font-semibold transition ${
-              activeTab === "certificats"
-                ? "bg-red-600 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            onClick={() => setActiveTab("pedagogie")}
+            className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              activeTab === "pedagogie" ? "bg-red-600 text-white shadow-lg shadow-red-900/20" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
             }`}
           >
-            Certificats Obtenus
-          </button>
-          <button
-            onClick={() => setActiveTab("presences")}
-            className={`px-6 py-3 rounded-xl font-semibold transition ${
-              activeTab === "presences"
-                ? "bg-red-600 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-            }`}
-          >
-            Présences
+            Suivi & Certificats
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          
-          {/* Section Achats */}
+        <div className="max-w-5xl mx-auto">
+          {/* SECTION ACHATS */}
           {activeTab === "achats" && (
-            <div className="lg:col-span-2 bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Vos achats passés</h2>
-              
+            <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8 animate-in fade-in slide-in-from-bottom-4">
+              <h2 className="text-2xl font-bold mb-6">Vos paiements récents</h2>
               {achats.length === 0 ? (
-                <p className="text-center text-slate-400 py-8">Aucun achat pour le moment</p>
+                <div className="text-center py-10 bg-slate-800/20 rounded-xl border border-dashed border-slate-700">
+                  <p className="text-slate-400 italic">Aucun achat enregistré.</p>
+                </div>
               ) : (
-                <div className="space-y-4">
+                <div className="grid gap-4">
                   {achats.map((achat) => (
-                    <div
-                      key={achat.id}
-                      className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-slate-600 transition"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-lg font-semibold text-white mb-1">
-                            Paiement #{achat.id}
-                          </p>
-                          <p className="text-sm text-slate-400">
-                            {new Date(achat.dateCreation).toLocaleDateString('fr-FR', {
-                              day: '2-digit',
-                              month: 'long',
-                              year: 'numeric'
-                            })}
-                          </p>
-                          <p className="text-slate-300 mt-2">
-                            Montant: {(achat.montantTotalCent / 100).toFixed(2)}€
-                          </p>
-                        </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            achat.statut === "PAID"
-                              ? "bg-green-500/20 text-green-400"
-                              : achat.statut === "CREATED"
-                              ? "bg-yellow-500/20 text-yellow-400"
-                              : "bg-red-500/20 text-red-400"
-                          }`}
-                        >
+                    <div key={achat.id} className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 flex justify-between items-center hover:border-slate-500 transition-colors">
+                      <div>
+                        <p className="font-bold text-lg">Commande #{achat.id}</p>
+                        <p className="text-sm text-slate-400">
+                          {new Date(achat.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-black text-white">{(achat.montantTotalCent / 100).toFixed(2)}€</p>
+                        <span className={`mt-1 text-xs uppercase px-3 py-1 font-bold rounded-full ${
+                          achat.statut === 'PAID' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                        }`}>
                           {achat.statut}
                         </span>
                       </div>
@@ -167,90 +129,36 @@ export default function DashboardApprenant() {
             </div>
           )}
 
-          {/* Section Certificats */}
-          {activeTab === "certificats" && (
-            <div className="lg:col-span-1 bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Certificats Obtenus</h2>
-              
-              {certificats.length === 0 ? (
-                <p className="text-center text-slate-400 py-8">Aucun certificat disponible</p>
-              ) : (
+          {/* SECTION PEDAGOGIE */}
+          {activeTab === "pedagogie" && (
+            <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4">
+              {/* Certificats */}
+              <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
+                <h3 className="text-xl font-bold mb-6 border-b border-slate-800 pb-3 text-red-500">🏆 Certificats</h3>
                 <div className="space-y-4">
-                  {certificats.map((cert) => (
-                    <div
-                      key={cert.id}
-                      className="bg-slate-800/50 rounded-xl p-5 border border-slate-700 hover:border-slate-600 transition"
-                    >
-                      <div className="flex justify-between items-center">
-                        <div className="flex-1">
-                          <p className="font-semibold text-white mb-1">{cert.formation}</p>
-                          <p className="text-sm text-slate-400">
-                            Note: {cert.note}/20
-                          </p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            {cert.validation ? "Validé" : "Non validé"}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => downloadCertificat(cert.id)}
-                          className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition"
-                          title="Télécharger"
-                        >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        </button>
-                      </div>
+                  {certificats.length > 0 ? certificats.map(cert => (
+                    <div key={cert.id} className="p-4 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                      <p className="font-bold text-white">{cert.formation?.titre || "Formation"}</p>
+                      <p className="text-green-400 font-bold">{cert.note}/20</p>
                     </div>
-                  ))}
+                  )) : <p className="text-slate-500 italic">Aucun certificat.</p>}
                 </div>
-              )}
-            </div>
-          )}
+              </div>
 
-          {/* Section Présences */}
-          {activeTab === "presences" && (
-            <div className="lg:col-span-1 bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Présences</h2>
-              
-              {presences.length === 0 ? (
-                <p className="text-center text-slate-400 py-8">Aucune présence enregistrée</p>
-              ) : (
-                <div className="space-y-4">
-                  {presences.map((pres) => (
-                    <div
-                      key={pres.id}
-                      className="bg-slate-800/50 rounded-xl p-5 border border-slate-700"
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold text-white mb-1">
-                            Session #{pres.sessionId}
-                          </p>
-                          <p className="text-sm text-slate-400">
-                            {new Date(pres.dateSession).toLocaleDateString('fr-FR', {
-                              day: '2-digit',
-                              month: 'long',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
-                        </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            pres.present
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-red-500/20 text-red-400"
-                          }`}
-                        >
-                          {pres.present ? "Présent" : "Absent"}
-                        </span>
-                      </div>
+              {/* Présences */}
+              <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
+                <h3 className="text-xl font-bold mb-6 border-b border-slate-800 pb-3 text-blue-500">📅 Présences</h3>
+                <div className="space-y-3">
+                  {presences.length > 0 ? presences.map(pres => (
+                    <div key={pres.id} className="p-4 bg-slate-800/40 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                      <p className="font-medium">Session #{pres.sessionId || pres.id}</p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${pres.present ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                        {pres.present ? "PRÉSENT" : "ABSENT"}
+                      </span>
                     </div>
-                  ))}
+                  )) : <p className="text-slate-500 italic">Aucun émargement.</p>}
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>

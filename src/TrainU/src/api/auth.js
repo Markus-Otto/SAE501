@@ -1,34 +1,16 @@
 // auth.js
-const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8080";
 
 export async function loginRequest({ email, password, role }) {
   
-  const endpoint = `${BASE}/api/auth/login`; 
-
-  const bodyData = { 
-    email, 
-    password,
-    role // ✅ Inclure le rôle dans la requête
-  };
-  
-  const res = await fetch(endpoint, {
+  const res = await fetch("http://localhost:8080/api/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(bodyData), 
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, role }), 
   });
 
   if (!res.ok) {
-    let details = "";
-    try {
-      const data = await res.json();
-      details = data.message || JSON.stringify(data);
-    } catch {
-      // rien
-    }
-    throw new Error(details || `Login failed (${res.status})`);
+    const data = await res.json();
+    throw new Error(data.message || "Erreur de connexion");
   }
-
   return res.json();
 }

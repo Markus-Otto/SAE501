@@ -2,12 +2,10 @@ package SAE501.JLTT.TrainU.Controller.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-
 import java.util.List;
 
-// CreatePaymentRequest.java
 public record CreatePaymentRequest(
-        @NotNull Long apprenantId,
+        @NotNull Integer apprenantId, 
         @Email @NotBlank String email,
         @NotEmpty @Valid List<Ligne> lignes
 ) {

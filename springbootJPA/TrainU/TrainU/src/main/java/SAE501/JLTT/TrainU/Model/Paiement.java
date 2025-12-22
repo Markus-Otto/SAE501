@@ -16,6 +16,7 @@ public class Paiement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ Note : En SQL c'est un BIGINT (Long), donc Long ici est correct.
     @Column(name = "id_apprenant", nullable = false)
     private Long apprenantId;
 
@@ -23,13 +24,13 @@ public class Paiement {
     private Integer montantTotalCent;
 
     @Column(nullable = false, length = 10)
-    private String devise; // actuellement seulement "eur"
+    private String devise;
 
     @Column(name = "stripe_intent_id", unique = true)
-    private String stripeIntentId; // null tant qu'on n'a pas parlé à Stripe
+    private String stripeIntentId;
 
     @Enumerated(EnumType.STRING)
-    private PaiementStatut statut; // CREATED, PAID, FAILED, REFUNDED_PARTIAL, REFUNDED_FULL
+    private PaiementStatut statut;
 
     @Column(name = "date_creation", nullable = false)
     private Instant dateCreation;
@@ -37,8 +38,4 @@ public class Paiement {
     @OneToMany(mappedBy = "paiement", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PaiementLigne> lignes = new ArrayList<>();
-
-
-
-
 }

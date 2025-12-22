@@ -3,7 +3,6 @@ package SAE501.JLTT.TrainU.Model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter
@@ -40,13 +39,11 @@ public class Apprenant {
     @OneToMany(mappedBy = "apprenant")
     private List<Emargement> emargements;
 
-    @OneToMany(mappedBy = "apprenantId")
-    private List<Paiement> paiements;
+
+    @OneToMany(mappedBy = "apprenant")
+    private List<Certificat> certificats;
 
     public String getRole() {
         return "apprenant";
     }
-
-   // @OneToMany(mappedBy = "apprenant")
-    //private List<Certificat> certificats;
 }

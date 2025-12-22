@@ -18,21 +18,24 @@ export default function LoginUtilisateur() {
   e.preventDefault();
   setBusy(true);
   setError(null);
+  
   try {
-    const data = await loginRequest({ email, password });
+    // ✅ On ajoute le rôle explicitement ici
+    const data = await loginRequest({ 
+      email, 
+      password, 
+      role: "apprenant" // On force le rôle pour cette page de login
+    });
     
-    // On appelle notre fonction login formatée
+    // Si l'API renvoie une erreur parce que c'est un admin, 
+    // elle tombera directement dans le catch(err)
+    
     login(data);
+    navigate("/DashboardApprenant");
 
-    // Redirection basée sur le rôle reçu de l'API
-    if (data.role === "admin") {
-      navigate("/admin/dashboard");
-    } else if (data.role === "intervenant") {
-      navigate("/intervenant/dashboard");
-    } else {
-      navigate("/DashboardApprenant");
-    }
   } catch (err) {
+    // L'erreur affichera "Accès refusé" ou "Identifiants incorrects" 
+    // selon ce que ton Backend renvoie
     setError(err.message || "Identifiants incorrects");
   } finally {
     setBusy(false);

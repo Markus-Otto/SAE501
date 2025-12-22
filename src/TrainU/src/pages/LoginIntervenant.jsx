@@ -14,26 +14,14 @@ export default function LoginIntervenant() {
 
  async function handleSubmit(e) {
   e.preventDefault();
-  setError(null);
   setBusy(true);
   try {
+    // ✅ On précise que c'est une tentative de login ADMIN
     const data = await loginRequest({ email, password, role: "intervenant" });
-    
-    // 🔍 DEBUG : Ajoute ce log pour voir exactement ce que Java envoie
-    console.log("Réponse API:", data);
-
-    // Vérification de sécurité sur l'objet plat renvoyé par Java
-    if (!data || data.role !== "intervenant") {
-      throw new Error("Accès réservé aux intervenants");
-    }
-    
-    // On envoie l'objet plat au context qui va s'occuper de le formater
     login(data);
-    
-    // Redirection
-    navigate("/intervenant/dashboard"); 
+    navigate("/intervenant/dashboard");
   } catch (err) {
-    setError(err.message || "Erreur de connexion");
+    setError(err.message);
   } finally {
     setBusy(false);
   }
