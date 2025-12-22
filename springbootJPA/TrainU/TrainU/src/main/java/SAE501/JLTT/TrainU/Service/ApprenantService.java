@@ -29,6 +29,23 @@ public class ApprenantService {
 
         return apprenantRepository.save(apprenant);
     }
+    public Apprenant updateApprenant(Integer id, Apprenant details) {
+        // ✅ Correction du nom : apprenantRepository
+        Apprenant a = apprenantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Apprenant non trouvé avec l'id : " + id));
+
+        a.setNom(details.getNom());
+        a.setPrenom(details.getPrenom());
+        a.setEmail(details.getEmail());
+
+        // ✅ Hachage du mot de passe s'il est modifié
+        if (details.getMotDePasse() != null && !details.getMotDePasse().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(details.getMotDePasse());
+            a.setMotDePasse(hashedPassword);
+        }
+
+        return apprenantRepository.save(a);
+    }
 
     public List<Apprenant> getAllApprenants() {
         return apprenantRepository.findAll();

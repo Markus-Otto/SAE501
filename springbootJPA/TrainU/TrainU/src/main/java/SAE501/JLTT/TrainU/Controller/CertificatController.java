@@ -4,6 +4,8 @@ import SAE501.JLTT.TrainU.Controller.dto.CertificatDTO;
 import SAE501.JLTT.TrainU.Model.Certificat;
 import SAE501.JLTT.TrainU.Service.CertificatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,58 +13,23 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificats")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173") // Plus sécurisé que "*"
 public class CertificatController {
 
     @Autowired
     private CertificatService certificatService;
 
-    @GetMapping
-    public List<Certificat> getAll() {
-        return certificatService.getAllCertificats();
-    }
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadCertificat(@PathVariable Integer id) {
+        return certificatService.getCertificatById(id).map(cert -> {
+            // Génération du contenu PDF via le service
+            byte[] pdfData = certificatService.genererCertificatPDF(cert);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Certificat> getById(@PathVariable Integer id) {
-        return certificatService.getCertificatById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public Certificat create(@RequestBody CertificatDTO dto) {
-        return certificatService.creerCertificat(
-                dto.getIdFormation(),
-                dto.getIdApprenant(),
-                dto.getNote()
-        );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Certificat> update(
-            @PathVariable Integer id,
-            @RequestBody CertificatDTO dto) {
-        try {
-            Certificat updated = certificatService.updateCertificat(
-                    id,
-                    dto.getIdFormation(),
-                    dto.getIdApprenant(),
-                    dto.getNote()
-            );
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        try {
-            certificatService.deleteCertificat(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"certificat_" + id + ".pdf\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfData);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/apprenant/{idApprenant}")
@@ -70,13 +37,24 @@ public class CertificatController {
         return certificatService.getCertificatsByApprenant(idApprenant);
     }
 
-    @GetMapping("/formation/{idFormation}")
-    public List<Certificat> getByFormation(@PathVariable Integer idFormation) {
-        return certificatService.getCertificatsByFormation(idFormation);
+    @PostMapping
+    public Certificat create(@RequestBody CertificatDTO dto) {
+        // Suppression de .doubleValue() pour envoyer un Integer
+        return certificatService.creerCertificat(
+                dto.getIdFormation(),
+                dto.getIdApprenant(),
+                dto.getNote()
+        );
     }
 
-    @GetMapping("/valides")
-    public List<Certificat> getValides() {
-        return certificatService.getCertificatsValides();
+    @GetMapping
+    public List<Certificat> getAll() {
+        return certificatService.getAllCertificats();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        certificatService.deleteCertificat(id);
+        return ResponseEntity.noContent().build();
     }
 }

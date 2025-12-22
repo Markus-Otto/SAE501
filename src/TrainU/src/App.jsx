@@ -17,6 +17,7 @@ import SessionSelection from "./pages/SessionSelection.jsx";
 import Paiement from "./pages/paiement.jsx";
 import SignUtilisateur from "./pages/SignUtilisateur.jsx";
 import DashboardApprenant from "./pages/Dashboardapp.jsx";
+import Profil from "./pages/Profil.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -39,6 +40,7 @@ export default function App() {
               {/* --- ROUTES PROTÉGÉES : APPRENANT --- */}
               <Route element={<ProtectedRoute allowedRoles={["apprenant", "utilisateur"]} />}>
                 <Route path="/DashboardApprenant" element={<DashboardApprenant />} />
+                <Route path="/profil" element={<Profil />} />
               </Route>
               
               <Route element={<ProtectedRoute allowedRoles={["apprenant", "utilisateur", "admin"]} />}>

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 public record CreatePaymentRequest(
-        @NotNull Integer apprenantId, 
+        @NotNull Integer apprenantId,
         @Email @NotBlank String email,
         @NotEmpty @Valid List<Ligne> lignes
 ) {

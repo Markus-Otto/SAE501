@@ -10,6 +10,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/apprenants")
+// ✅ Étape 1 : Autoriser React (CORS)
+@CrossOrigin(origins = "http://localhost:5173")
 public class ApprenantController {
 
     private final ApprenantService apprenantService;
@@ -18,20 +20,29 @@ public class ApprenantController {
         this.apprenantService = apprenantService;
     }
 
-    //  Créer un apprenant
+    // ✅ Étape 2 : Ajouter la méthode PUT pour la mise à jour
+    @PutMapping("/{id}")
+    public ResponseEntity<Apprenant> modifierApprenant(@PathVariable Integer id, @RequestBody Apprenant apprenantDetails) {
+        try {
+            // On demande au service de faire la modification
+            Apprenant misAJour = apprenantService.updateApprenant(id, apprenantDetails);
+            return ResponseEntity.ok(misAJour);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Apprenant> creerApprenant(@RequestBody Apprenant apprenant) {
         Apprenant nouveau = apprenantService.creerApprenant(apprenant);
         return new ResponseEntity<>(nouveau, HttpStatus.CREATED);
     }
 
-    //  Récupérer tous les apprenants
     @GetMapping
     public ResponseEntity<List<Apprenant>> getAllApprenants() {
         return ResponseEntity.ok(apprenantService.getAllApprenants());
     }
 
-    //  Récupérer un apprenant par ID
     @GetMapping("/{id}")
     public ResponseEntity<Apprenant> getApprenantById(@PathVariable Integer id) {
         return apprenantService.getApprenantById(id)
@@ -39,7 +50,6 @@ public class ApprenantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //  Supprimer un apprenant
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimerApprenant(@PathVariable Integer id) {
         apprenantService.supprimerApprenant(id);
