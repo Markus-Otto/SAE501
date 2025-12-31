@@ -1,5 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,13 +35,16 @@ public class Apprenant {
     private Boolean active = true;
 
     @OneToMany(mappedBy = "apprenant")
+    @JsonIgnore
     private List<Inscription> inscriptions;
 
     @OneToMany(mappedBy = "apprenant")
+    @JsonIgnore
     private List<Emargement> emargements;
 
 
     @OneToMany(mappedBy = "apprenant")
+    @JsonIgnore
     private List<Certificat> certificats;
 
     public String getRole() {

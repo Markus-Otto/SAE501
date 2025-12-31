@@ -1,8 +1,11 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,4 +38,8 @@ public class Intervenant {
     public String getRole() {
         return "intervenant";
     }
+
+    @OneToMany(mappedBy = "intervenant")
+    @JsonIgnore
+    private List<Session> sessions;
 }

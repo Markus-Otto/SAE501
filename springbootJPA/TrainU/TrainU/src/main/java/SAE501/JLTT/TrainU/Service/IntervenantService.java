@@ -43,4 +43,20 @@ public class IntervenantService {
     public void delIntervenant(Integer id) {
         intervenantRepository.deleteById(id);
     }
+
+    public Intervenant updateIntervenant(Integer id, Intervenant details) {
+        Intervenant i = intervenantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Intervenant non trouvé"));
+
+        i.setNom(details.getNom());
+        i.setPrenom(details.getPrenom());
+        i.setEmail(details.getEmail());
+        i.setTelephone(details.getTelephone());
+
+        if (details.getMotDePasse() != null && !details.getMotDePasse().isEmpty()) {
+            i.setMotDePasse(passwordEncoder.encode(details.getMotDePasse()));
+        }
+
+        return intervenantRepository.save(i);
+    }
 }

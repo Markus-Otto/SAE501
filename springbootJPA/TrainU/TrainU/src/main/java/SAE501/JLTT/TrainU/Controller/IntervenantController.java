@@ -41,6 +41,13 @@ public class IntervenantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    //  Modifier ID (modif profil)
+    @PutMapping("/{id}")
+    public ResponseEntity<Intervenant> updateIntervenant(@PathVariable Integer id, @RequestBody Intervenant details) {
+        Intervenant updated = intervenantService.updateIntervenant(id, details);
+        return ResponseEntity.ok(updated);
+    }
+
     //  Supprimer un apprenant
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delIntervenant(@PathVariable Integer id) {

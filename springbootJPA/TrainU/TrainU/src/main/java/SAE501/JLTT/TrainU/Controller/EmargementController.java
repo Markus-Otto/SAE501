@@ -22,7 +22,7 @@ public class EmargementController {
         return service.getAll();
     }
 
-    // ✅ CORRECTION : Utilisation de l'instance "service" et de la bonne méthode
+    // CORRECTION : Utilisation de l'instance "service" et de la bonne méthode
     @GetMapping("/apprenant/{idApprenant}")
     public List<Emargement> getByApprenant(@PathVariable Integer idApprenant) {
         return service.getByApprenant(idApprenant);
@@ -35,5 +35,17 @@ public class EmargementController {
             @RequestParam Boolean present
     ) {
         return service.create(idSession, idApprenant, present);
+    }
+
+    //  Pour récupérer la session
+    @GetMapping("/session/{idSession}")
+    public List<Emargement> getBySession(@PathVariable Integer idSession) {
+        return service.getBySession(idSession);
+    }
+
+    // Modifier la session
+    @PutMapping("/{id}")
+    public Emargement update(@PathVariable Integer id, @RequestParam Boolean present) {
+        return service.update(id, present);
     }
 }

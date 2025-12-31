@@ -1,6 +1,7 @@
 package SAE501.JLTT.TrainU.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class Certificat {
     // lire "certificat.formation.titre".
     @ManyToOne
     @JoinColumn(name = "ID_FORMATION")
+    @JsonIgnoreProperties({"sessions"})
     private Formation formation;
 
     // ✅ CORRECTION 2 : On garde une seule déclaration pour Apprenant.

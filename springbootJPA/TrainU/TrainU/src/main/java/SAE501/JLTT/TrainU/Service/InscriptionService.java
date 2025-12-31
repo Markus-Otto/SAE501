@@ -50,4 +50,9 @@ public class InscriptionService {
     public List<Inscription> getAllInscriptions() {
         return inscriptionRepository.findAll();
     }
+
+    // Pour désínscrire un utilisateur d'une session
+    public void deleteInscription(Integer id) {
+        inscriptionRepository.deleteById(id);
+    }
 }

@@ -20,24 +20,64 @@ public class CertificatService {
     @Autowired private FormationRepository formationRepository;
     @Autowired private ApprenantRepository apprenantRepository;
 
-    // ✅ Génération du PDF
+    // ✅ Génération du PDF avec design amélioré
     public byte[] genererCertificatPDF(Certificat cert) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document document = new Document(PageSize.A4.rotate());
+        Document document = new Document(PageSize.A4.rotate(), 50, 50, 50, 50);
         try {
-            PdfWriter.getInstance(document, out);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
             document.open();
 
-            Font fontTitre = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 36);
-            Font fontInfo = FontFactory.getFont(FontFactory.HELVETICA, 18);
+            // Bordure décorative
+            document.add(new Paragraph("\n\n"));
+            
+            // Titre principal
+            Font fontTitre = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 48, new java.awt.Color(220, 38, 38));
+            Paragraph titre = new Paragraph("CERTIFICAT DE RÉUSSITE", fontTitre);
+            titre.setAlignment(Element.ALIGN_CENTER);
+            titre.setSpacingAfter(30);
+            document.add(titre);
 
-            Paragraph t = new Paragraph("CERTIFICAT DE RÉUSSITE", fontTitre);
-            t.setAlignment(Element.ALIGN_CENTER);
-            document.add(t);
+            // Sous-titre
+            Font fontSousTitre = FontFactory.getFont(FontFactory.HELVETICA, 16, new java.awt.Color(100, 100, 100));
+            Paragraph sousTitre = new Paragraph("Ce certificat atteste que", fontSousTitre);
+            sousTitre.setAlignment(Element.ALIGN_CENTER);
+            sousTitre.setSpacingAfter(20);
+            document.add(sousTitre);
 
-            document.add(new Paragraph("\nNom : " + cert.getNomCompletApprenant(), fontInfo));
-            document.add(new Paragraph("Formation : " + cert.getNomFormation(), fontInfo));
-            document.add(new Paragraph("Note : " + cert.getNote() + "/20", fontInfo));
+            // Nom de l'apprenant
+            Font fontNom = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 32, new java.awt.Color(30, 41, 59));
+            Paragraph nom = new Paragraph(cert.getNomCompletApprenant(), fontNom);
+            nom.setAlignment(Element.ALIGN_CENTER);
+            nom.setSpacingAfter(30);
+            document.add(nom);
+
+            // Formation
+            Font fontTexte = FontFactory.getFont(FontFactory.HELVETICA, 18, new java.awt.Color(71, 85, 105));
+            Paragraph formation = new Paragraph("a suivi avec succès la formation", fontTexte);
+            formation.setAlignment(Element.ALIGN_CENTER);
+            formation.setSpacingAfter(15);
+            document.add(formation);
+
+            Font fontFormation = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, new java.awt.Color(220, 38, 38));
+            Paragraph nomFormation = new Paragraph(cert.getNomFormation(), fontFormation);
+            nomFormation.setAlignment(Element.ALIGN_CENTER);
+            nomFormation.setSpacingAfter(40);
+            document.add(nomFormation);
+
+            // Note
+            Font fontNote = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 28, 
+                cert.getNote() >= 15 ? new java.awt.Color(34, 197, 94) : new java.awt.Color(59, 130, 246));
+            Paragraph note = new Paragraph("Note obtenue : " + cert.getNote() + "/20", fontNote);
+            note.setAlignment(Element.ALIGN_CENTER);
+            note.setSpacingAfter(50);
+            document.add(note);
+
+            // Date
+            Font fontDate = FontFactory.getFont(FontFactory.HELVETICA, 14, new java.awt.Color(100, 100, 100));
+            Paragraph date = new Paragraph("Délivré le " + new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()), fontDate);
+            date.setAlignment(Element.ALIGN_CENTER);
+            document.add(date);
 
             document.close();
         } catch (Exception e) {

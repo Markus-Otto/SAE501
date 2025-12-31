@@ -46,4 +46,15 @@ public class EmargementService {
 
         return emargementRepository.save(e);
     }
+
+    public List<Emargement> getBySession(Integer idSession) {
+        return emargementRepository.findBySessionId(idSession);
+    }
+
+    public Emargement update(Integer id, Boolean present) {
+        Emargement e = emargementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Émargement introuvable"));
+        e.setPresent(present);
+        return emargementRepository.save(e);
+    }
 }

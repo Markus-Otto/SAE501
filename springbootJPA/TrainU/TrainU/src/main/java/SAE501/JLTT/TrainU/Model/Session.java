@@ -47,4 +47,10 @@ public class Session {
     @OneToMany(mappedBy = "session")
     private List<Emargement> emargements;
 
+    private String salle;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_INTERVENANT")
+    @JsonIgnoreProperties({"sessions", "motDePasse"})
+    private Intervenant intervenant;
 }

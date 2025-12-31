@@ -1,5 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -27,10 +28,12 @@ public class Inscription {
 
     @ManyToOne
     @JoinColumn(name = "ID_APPRENANT", nullable = false)
+    @JsonIgnoreProperties({"inscriptions", "emargements", "certificats", "motDePasse"})
     private Apprenant apprenant;
 
     @ManyToOne
     @JoinColumn(name = "ID_SESSION", nullable = false)
+    @JsonIgnoreProperties({"emargements", "formation"})
     private Session session;
 
     public Inscription() {}

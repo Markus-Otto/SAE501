@@ -35,4 +35,10 @@ public class InscriptionController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInscription(@PathVariable Integer id) {
+        inscriptionService.deleteInscription(id);
+        return ResponseEntity.noContent().build();
+    }
 }

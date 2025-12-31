@@ -1,6 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // 👈 AJOUTE CET IMPORT
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,11 +19,11 @@ public class Emargement {
 
     @ManyToOne
     @JoinColumn(name = "id_session")
+    @JsonIgnoreProperties({"emargements", "formation", "intervenant"})
     private Session session;
 
-    // ✅ CORRECTION : Ajout de @JsonIgnore pour stopper la boucle infinie
     @ManyToOne
     @JoinColumn(name = "ID_APPRENANT")
-    @JsonIgnore
+    @JsonIgnoreProperties({"inscriptions", "emargements", "certificats", "motDePasse"})
     private Apprenant apprenant;
 }

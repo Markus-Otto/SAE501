@@ -57,6 +57,17 @@ public class DataLoader implements CommandLineRunner {
             log.info("→ Administrateur 'superadmin' existe déjà");
         }
 
+        // 1c. Créer administrateur "admin@test.com" si n'existe pas
+        if (administratorRepository.findByLogin("admin@test.com").isEmpty()) {
+            Administrator adminEmail = new Administrator();
+            adminEmail.setLogin("admin@test.com");
+            adminEmail.setMotDePasse(passwordEncoder.encode("admin123"));
+            administratorRepository.save(adminEmail);
+            log.info("✓ Administrateur 'admin@test.com' créé");
+        } else {
+            log.info("→ Administrateur 'admin@test.com' existe déjà");
+        }
+
         // 2. Créer 5 intervenants standards
         List<Intervenant> intervenants = createIntervenantsIfNotExist(5, intervenantPassword);
         log.info("✓ {} intervenants standards créés/vérifiés", intervenants.size());
@@ -170,6 +181,7 @@ public class DataLoader implements CommandLineRunner {
         log.info("ADMINISTRATEURS:");
         log.info("  1. Login: admin          | Mot de passe: admin123");
         log.info("  2. Login: superadmin     | Mot de passe: SuperPass2024!");
+        log.info("  3. Login: admin@test.com | Mot de passe: admin123");
         log.info("");
         log.info("INTERVENANTS:");
         log.info("  - Email: intervenant1..5@test.com | Mot de passe: intervenant123");
