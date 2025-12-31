@@ -19,7 +19,8 @@ public class Emargement {
 
     @ManyToOne
     @JoinColumn(name = "id_session")
-    @JsonIgnoreProperties({"emargements", "formation", "intervenant"})
+// On ajoute "formation" à la liste des propriétés à ignorer pour simplifier le JSON
+    @JsonIgnoreProperties({"emargements", "intervenant", "inscriptions", "formation"})
     private Session session;
 
     @ManyToOne

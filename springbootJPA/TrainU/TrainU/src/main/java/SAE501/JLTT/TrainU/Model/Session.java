@@ -39,9 +39,13 @@ public class Session {
     private Integer nombrePoste;
 
     @ManyToOne
-    @JoinColumn(name = "ID_FORMATION", nullable = false)
+    @JoinColumn(name = "id_formation")
     @JsonIgnoreProperties("sessions")
     private Formation formation;
+
+    @OneToMany(mappedBy = "session")
+    @JsonIgnore
+    private List<Inscription> inscriptions;
 
     @JsonIgnore
     @OneToMany(mappedBy = "session")

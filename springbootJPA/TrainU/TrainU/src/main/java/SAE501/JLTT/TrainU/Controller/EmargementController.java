@@ -2,6 +2,7 @@ package SAE501.JLTT.TrainU.Controller;
 
 import SAE501.JLTT.TrainU.Model.Emargement;
 import SAE501.JLTT.TrainU.Service.EmargementService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +24,9 @@ public class EmargementController {
     }
 
     // CORRECTION : Utilisation de l'instance "service" et de la bonne méthode
-    @GetMapping("/apprenant/{idApprenant}")
-    public List<Emargement> getByApprenant(@PathVariable Integer idApprenant) {
-        return service.getByApprenant(idApprenant);
+    @GetMapping("/apprenant/{id}")
+    public List<Emargement> getByApprenant(@PathVariable Integer id) {
+        return service.getByApprenant(id); // 👈 C'était "emargementService" avant
     }
 
     @PostMapping

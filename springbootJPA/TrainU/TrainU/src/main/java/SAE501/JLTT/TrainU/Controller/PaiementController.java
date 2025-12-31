@@ -4,6 +4,7 @@ import SAE501.JLTT.TrainU.Controller.dto.*;
 import SAE501.JLTT.TrainU.Service.PaiementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +37,10 @@ public class PaiementController {
     public List<PaiementListItem> list() { return paiementService.list(); }
 
     @GetMapping("/{id}")
-    public PaiementDetails details(@PathVariable Long id) { return paiementService.details(id); }
-
+    public PaiementDetails getPaiement(@PathVariable Long id) {
+        // ✅ On renvoie le DTO (propre et plat), pas l'entité Paiement
+        return paiementService.details(id);
+    }
     @PostMapping("/{id}/cancel")
     public PaiementDetails cancel(@PathVariable Long id) {
         return paiementService.cancel(id);

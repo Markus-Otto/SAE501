@@ -1,5 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -27,13 +28,13 @@ public class Inscription {
     private LocalDateTime dateInscription;
 
     @ManyToOne
-    @JoinColumn(name = "ID_APPRENANT", nullable = false)
-    @JsonIgnoreProperties({"inscriptions", "emargements", "certificats", "motDePasse"})
+    @JoinColumn(name = "apprenant_id")
+    @JsonIgnore // 👈 Empêche de repartir vers l'apprenant en boucle
     private Apprenant apprenant;
 
     @ManyToOne
-    @JoinColumn(name = "ID_SESSION", nullable = false)
-    @JsonIgnoreProperties({"emargements", "formation"})
+    @JoinColumn(name = "session_id")
+    @JsonIgnore // 👈 Empêche de repartir vers la session
     private Session session;
 
     public Inscription() {}

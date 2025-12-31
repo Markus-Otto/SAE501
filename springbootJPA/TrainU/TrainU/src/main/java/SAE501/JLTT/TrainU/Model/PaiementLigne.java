@@ -1,5 +1,7 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,13 +14,17 @@ public class PaiementLigne {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_paiement", nullable = false)
+    // Dans PaiementLigne.java
+
+    @ManyToOne
+    @JoinColumn(name = "id_inscription")
+    private Inscription inscription;
+
+    @ManyToOne
+    @JoinColumn(name = "id_paiement")
+    @JsonIgnore // 👈 Très important : ne pas re-sérialiser le paiement depuis la ligne
     private Paiement paiement;
 
-    @Column(name = "id_inscription", nullable = false)
-    private Long inscriptionId;
-
-    @Column(name = "montant_cent", nullable = false)
+    @Column(name = "montant_cent")
     private Integer montantCent;
 }

@@ -1,9 +1,11 @@
 package SAE501.JLTT.TrainU.Service.impl;
 
 import SAE501.JLTT.TrainU.Controller.dto.*;
+import SAE501.JLTT.TrainU.Model.Inscription; // ✅ Import Ajouté
 import SAE501.JLTT.TrainU.Model.Paiement;
 import SAE501.JLTT.TrainU.Model.PaiementLigne;
 import SAE501.JLTT.TrainU.Model.PaiementStatut;
+import SAE501.JLTT.TrainU.Repository.InscriptionRepository; // ✅ Import Ajouté
 import SAE501.JLTT.TrainU.Repository.PaiementLigneRepository;
 import SAE501.JLTT.TrainU.Repository.PaiementRepository;
 import SAE501.JLTT.TrainU.Repository.RemboursementRepository;
@@ -26,11 +28,12 @@ public class PaiementServiceImpl implements PaiementService {
     private final PaiementLigneRepository ligneRepo;
     private final StripePort stripePort;
     private final RemboursementRepository remboursementRepo;
+    // ✅ AJOUT INDISPENSABLE : Pour transformer l'ID en Objet
+    private final InscriptionRepository inscriptionRepo;
 
     @Override
     @Transactional(readOnly = true)
     public List<PaiementListItem> getByApprenantId(Integer idApprenant) {
-        // ✅ Correction : Conversion explicite de Integer vers Long
         Long idLong = (idApprenant != null) ? idApprenant.longValue() : 0L;
 
         return paiementRepo.findByApprenantId(idLong)
@@ -49,7 +52,6 @@ public class PaiementServiceImpl implements PaiementService {
     }
 
     private PaiementListItem mapToListItem(Paiement p) {
-        // ✅ On s'assure que si le DTO attend un Integer, on convertit le Long du modèle
         Integer apprenantIdFinal = 0;
         if (p.getApprenantId() != null) {
             apprenantIdFinal = p.getApprenantId().intValue();
@@ -72,14 +74,30 @@ public class PaiementServiceImpl implements PaiementService {
         Paiement p = paiementRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Paiement non trouvé : " + id));
 
-        var lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
-                .map(l -> new PaiementDetails.Ligne(l.getInscriptionId(), l.getMontantCent()))
+        List<PaiementDetails.Ligne> lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
+                .map(l -> {
+                    // ✅ SÉCURISATION : On vérifie si l'inscription existe
+                    var ins = l.getInscription();
+                    if (ins == null) return new PaiementDetails.Ligne(0, l.getMontantCent(), "Inscription manquante", null, null);
+
+                    // ✅ SÉCURISATION : On vérifie si la session existe
+                    var sess = ins.getSession();
+                    if (sess == null) return new PaiementDetails.Ligne(ins.getId().intValue(), l.getMontantCent(), "Session non définie", null, null);
+
+                    // ✅ SÉCURISATION : On vérifie si la formation existe
+                    String titre = (sess.getFormation() != null) ? sess.getFormation().getTitre() : "Formation inconnue";
+
+                    return new PaiementDetails.Ligne(
+                            ins.getId().intValue(),
+                            l.getMontantCent(),
+                            titre,
+                            sess.getDateDebut(),
+                            sess.getDateFin()
+                    );
+                })
                 .toList();
 
-        Integer apprenantIdFinal = 0;
-        if (p.getApprenantId() != null) {
-            apprenantIdFinal = p.getApprenantId().intValue();
-        }
+        Integer apprenantIdFinal = (p.getApprenantId() != null) ? p.getApprenantId().intValue() : 0;
 
         return new PaiementDetails(
                 p.getId(),
@@ -96,9 +114,6 @@ public class PaiementServiceImpl implements PaiementService {
     @Override
     public CreatePaymentResponse createPayment(CreatePaymentRequest req) {
         int total = req.lignes().stream().mapToInt(CreatePaymentRequest.Ligne::montantCent).sum();
-
-        // ✅ Correction cruciale : Conversion explicite vers Long
-        // On utilise longValue() pour extraire la valeur si req.apprenantId() est un Integer
         Long appId = (req.apprenantId() != null) ? req.apprenantId().longValue() : 0L;
 
         Paiement p = Paiement.builder()
@@ -112,9 +127,19 @@ public class PaiementServiceImpl implements PaiementService {
         paiementRepo.save(p);
 
         for (var l : req.lignes()) {
+            // 1. On récupère l'ID du DTO et on s'assure qu'il est converti en Long pour le calcul
+            Long idLong = (l.inscriptionId() != null) ? l.inscriptionId().longValue() : 0L;
+
+            // 2. On convertit ce Long en Integer pour correspondre au Repository
+            // Math.toIntExact lève une erreur si le nombre est trop grand pour un Integer
+            Integer idInscriptionInt = Math.toIntExact(idLong);
+
+            Inscription inscription = inscriptionRepo.findById(idInscriptionInt)
+                    .orElseThrow(() -> new RuntimeException("Inscription introuvable ID: " + idInscriptionInt));
+
             ligneRepo.save(PaiementLigne.builder()
                     .paiement(p)
-                    .inscriptionId(l.inscriptionId())
+                    .inscription(inscription)
                     .montantCent(l.montantCent())
                     .build());
         }

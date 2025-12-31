@@ -35,8 +35,12 @@ public class Apprenant {
     private Boolean active = true;
 
     @OneToMany(mappedBy = "apprenant")
-    @JsonIgnore
+    @JsonIgnore // 👈 Indispensable pour éviter que l'apprenant ne recharge toutes ses inscriptions/paiements en boucle
     private List<Inscription> inscriptions;
+
+    @OneToMany(mappedBy = "apprenantId") // ou le nom de votre relation vers Paiement
+    @JsonIgnore
+    private List<Paiement> paiements;
 
     @OneToMany(mappedBy = "apprenant")
     @JsonIgnore

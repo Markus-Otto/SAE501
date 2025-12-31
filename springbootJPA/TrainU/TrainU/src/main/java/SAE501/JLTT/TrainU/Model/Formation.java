@@ -1,5 +1,6 @@
 package SAE501.JLTT.TrainU.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,5 +34,6 @@ public class Formation {
 
     // Dans Formation.java
     @OneToMany(mappedBy = "formation")
+    @JsonIgnore
     private List<Session> sessions;
 }

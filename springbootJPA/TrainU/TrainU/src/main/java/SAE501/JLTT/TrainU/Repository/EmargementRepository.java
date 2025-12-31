@@ -7,7 +7,6 @@ import java.util.List;
 
 @Repository
 public interface EmargementRepository extends JpaRepository<Emargement, Integer> {
-
-    List<Emargement> findByApprenantId(Integer id);
+    List<Emargement> findByApprenantId(Integer idApprenant);
     List<Emargement> findBySessionId(Integer sessionId);
 }
