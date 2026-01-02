@@ -34,7 +34,6 @@ public class Inscription {
 
     @ManyToOne
     @JoinColumn(name = "session_id")
-    @JsonIgnore // 👈 Empêche de repartir vers la session
     private Session session;
 
     public Inscription() {}

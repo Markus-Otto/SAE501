@@ -77,9 +77,9 @@ export default function FeuilleEmargement() {
                             >
                                 <h4 className="font-bold text-lg mb-2">{session.titre}</h4>
                                 <div className="text-sm text-slate-400 space-y-1">
-                                    <p>📅 {new Date(session.dateDebut).toLocaleDateString()} - {new Date(session.dateFin).toLocaleDateString()}</p>
-                                    <p>🏢 Salle: {session.salle || "Non définie"}</p>
-                                    <p>👥 {session.nombreParticipants || 0} participants</p>
+                                    <p>{new Date(session.dateDebut).toLocaleDateString()} - {new Date(session.dateFin).toLocaleDateString()}</p>
+                                    <p>Salle: {session.salle || "Non définie"}</p>
+                                    <p>{session.nombreParticipants || 0} participants</p>
                                 </div>
                             </button>
                         ))}

@@ -27,12 +27,6 @@ export default function DashboardAdmin() {
                         </h1>
                         <p className="text-slate-400">Connecté en tant que {user?.email}</p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="p-3 bg-red-600 hover:bg-red-700 rounded-2xl transition border border-red-500 flex items-center gap-2"
-                    >
-                        <span>🚪</span> <span className="hidden md:inline">Déconnexion</span>
-                    </button>
                 </div>
 
                 {/* Navigation */}
@@ -42,21 +36,21 @@ export default function DashboardAdmin() {
                         className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "catalogue" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
                             }`}
                     >
-                        📚 Catalogue de Formation
+                        Catalogue de Formation
                     </button>
                     <button
                         onClick={() => setActiveTab("sessions")}
                         className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "sessions" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
                             }`}
                     >
-                        📅 Gestion des Sessions
+                        Gestion des Sessions
                     </button>
                     <button
                         onClick={() => setActiveTab("utilisateurs")}
                         className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "utilisateurs" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
                             }`}
                     >
-                        👥 Gestion des Utilisateurs
+                        Gestion des Utilisateurs
                     </button>
                 </div>
 

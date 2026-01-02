@@ -28,10 +28,10 @@ export default function DashboardIntervenant() {
                         <p className="text-slate-400">Bienvenue, {user?.prenom} {user?.nom}</p>
                     </div>
                     <button
-                        onClick={handleLogout}
-                        className="p-3 bg-red-600 hover:bg-red-700 rounded-2xl transition border border-red-500 flex items-center gap-2"
+                        onClick={() => setActiveTab("profil")}
+                        className="p-3 bg-slate-800 hover:bg-slate-700 rounded-2xl transition border border-slate-700 flex items-center gap-2 group"
                     >
-                        <span>🚪</span> <span className="hidden md:inline">Déconnexion</span>
+                    <span className="hidden md:inline">Mon Profil</span>
                     </button>
                 </div>
 
@@ -42,21 +42,14 @@ export default function DashboardIntervenant() {
                         className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "emargement" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
                             }`}
                     >
-                        ✅ Feuille d'Émargement
+                        Feuille d'Émargement
                     </button>
                     <button
                         onClick={() => setActiveTab("notes")}
                         className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "notes" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
                             }`}
                     >
-                        📝 Saisie des Notes
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("profil")}
-                        className={`px-8 py-3 rounded-2xl font-bold transition-all ${activeTab === "profil" ? "bg-red-600 text-white" : "bg-slate-900 text-slate-400 border border-slate-800"
-                            }`}
-                    >
-                        ⚙️ Mon Profil
+                        Saisie des Notes
                     </button>
                 </div>
 
@@ -65,6 +58,7 @@ export default function DashboardIntervenant() {
                     {activeTab === "emargement" && <FeuilleEmargement />}
                     {activeTab === "notes" && <SaisieNotes />}
                     {activeTab === "profil" && <ProfilIntervenant />}
+                    
                 </div>
             </div>
         </div>

@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import Profil from "./Profil.jsx";
 
 export default function DashboardApprenant() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [certificats, setCertificats] = useState([]);
   const [presences, setPresences] = useState([]);
   const [achats, setAchats] = useState([]);
@@ -23,27 +22,37 @@ export default function DashboardApprenant() {
     const urls = [
       `http://localhost:8080/api/certificats/apprenant/${id}`,
       `http://localhost:8080/api/emargement/apprenant/${id}`,
-      `http://localhost:8080/api/payments/apprenant/${id}`
+      `http://localhost:8080/api/payments/apprenant/${id}`,
+
     ];
 
     try {
       const results = await Promise.allSettled(urls.map(url => fetch(url)));
 
-      if (results[0].status === "fulfilled" && results[0].value.ok) {
-        setCertificats(await results[0].value.json());
-      }
-      if (results[1].status === "fulfilled" && results[1].value.ok) {
-        setPresences(await results[1].value.json());
-      }
-      if (results[2].status === "fulfilled" && results[2].value.ok) {
-        setAchats(await results[2].value.json());
-      }
-    } catch (error) {
-      console.error("Erreur chargement:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+     // Certificats
+    if (results[0].status === "fulfilled" && results[0].value.ok) {
+      const dataCertifs = await results[0].value.json();
+      setCertificats(dataCertifs);
+    }
+    
+    // Présences
+    if (results[1].status === "fulfilled" && results[1].value.ok) {
+      const dataPresences = await results[1].value.json();
+      setPresences(dataPresences);
+    }
+    
+    // Paiements (Achats)
+    if (results[2].status === "fulfilled" && results[2].value.ok) {
+  const dataPayments = await results[2].value.json();
+  setAchats(dataPayments);
+}
+
+  } catch (error) {
+    console.error("Erreur chargement:", error);
+  } finally {
+    setLoading(false);
+  }
+}
 
   const handleDownload = (certId) => {
     window.open(`http://localhost:8080/api/certificats/download/${certId}`, "_blank");
@@ -64,17 +73,18 @@ export default function DashboardApprenant() {
         {/* En-tête */}
         <div className="flex justify-between items-center bg-slate-900/40 p-6 rounded-3xl border border-slate-800 shadow-xl">
           <div>
-            <h1 className="text-3xl font-bold">
-              Bienvenue, <span className="text-red-600">{user?.prenom} {user?.nom}</span>
-            </h1>
-            <p className="text-slate-400">Ravi de vous revoir sur TrainU</p>
-          </div>
-          <button 
-            onClick={() => navigate("/profil")}
-            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-2xl transition border border-slate-700 flex items-center gap-2 group"
-          >
-            <span className="hidden md:inline">Paramètres</span>
-          </button>
+                <h1 className="text-3xl font-bold">
+                Dashboard <span className="text-red-600">Apprenant</span>
+                </h1>
+                <p className="text-slate-400">Bienvenue, {user?.prenom} {user?.nom}</p>
+            </div>
+           <button
+                    onClick={() => setActiveTab("profil")}
+                    className="p-3 bg-slate-800 hover:bg-slate-700 rounded-2xl transition border border-slate-700 flex items-center gap-2 group"
+                    >
+                    <span className="hidden md:inline">Mon Profil</span>
+                    </button>
+                    
         </div>
 
         {/* Navigation Onglets */}
@@ -96,92 +106,86 @@ export default function DashboardApprenant() {
           Pédagogie & Diplômes
           </button>
         </div>
-
+{activeTab === "profil" && <Profil />}
         <div className="max-w-6xl mx-auto">
 {/* SECTION ACHATS REGROUPÉE */}
+{/* SECTION ACHATS / PAIEMENTS */}
 {activeTab === "achats" && (
-  <div className="bg-slate-900/50 rounded-3xl border border-slate-800 p-8 animate-in fade-in">
-    <h2 className="text-2xl font-bold mb-8 text-white">Historique des commandes</h2>
-    
-    {achats.length === 0 ? (
-      <div className="text-center py-20 opacity-50 italic">Aucun achat enregistré.</div>
-    ) : (
-      <div className="space-y-6">
-        {achats.map((achat) => (
-          <div key={achat.id} className="bg-slate-800/30 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-            
-            {/* Header : Infos Paiement */}
-            <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
-              <div>
-                <p className="font-bold uppercase text-[10px] text-slate-500 tracking-widest mb-1">
-                  Commande #{achat.id}
-                </p>
-                <p className="text-sm font-medium text-slate-300">
-                  {achat.dateCreation ? new Date(achat.dateCreation).toLocaleDateString('fr-FR') : "Date inconnue"}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xl font-black text-white">
-                  {(achat.montantTotalCent / 100).toFixed(2)} €
-                </p>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-green-500/10 text-green-500 rounded-md border border-green-500/20 uppercase">
-                  {achat.statut}
-                </span>
-              </div>
-            </div>
+  <div className="bg-slate-900/50 rounded-3xl border border-slate-800 p-8 animate-in fade-in">
+    <h2 className="text-2xl font-bold mb-8 text-white">Historique des commandes</h2>
+    
+    {achats.length === 0 ? (
+      <div className="text-center py-20 opacity-50 italic">Aucun paiement enregistré.</div>
+    ) : (
+      <div className="space-y-6">
+        {achats.map((payment) => {
+          // On récupère les lignes de paiement (souvent nommées paymentLines en Java)
+          const lignes = payment.lignes || payment.paymentLines || [];
 
-            {/* Détails : Infos Session */}
-            <div className="p-5 space-y-4">
-              {achat.lignes && achat.lignes.length > 0 ? (
-                achat.lignes.map((ligne, idx) => {
-                  // Récupération des objets imbriqués (Si chargés par le backend)
-                  const session = ligne.inscription?.session;
-                  const formation = session?.formation;
+          return (
+            <div key={payment.id} className="bg-slate-800/30 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+              
+              {/* Header : Infos Paiement */}
+              <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+                <div>
+                  <p className="font-bold uppercase text-[10px] text-slate-500 tracking-widest mb-1">
+                    Paiement #{payment.id}
+                  </p>
+                  <p className="text-sm font-medium text-slate-300">
+                    {payment.dateCreation ? new Date(payment.dateCreation).toLocaleDateString('fr-FR') : "Date inconnue"}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-black text-white">
+                    {(payment.montantTotalCent / 100).toFixed(2)} €
+                  </p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-green-500/10 text-green-500 rounded-md border border-green-500/20 uppercase">
+                    {payment.statut || "Complété"}
+                  </span>
+                </div>
+              </div>
 
-                  return (
-                    <div key={idx} className="flex flex-col md:flex-row gap-6 p-4 bg-slate-900/40 rounded-xl border border-slate-700/50 items-center">
-                      <div className="flex-1 space-y-3">
-                        {/* Affiche le titre si dispo, sinon l'ID de l'inscription */}
-                        <h3 className="text-red-600 font-bold text-lg uppercase tracking-tight">
-                          {formation?.titre || `Formation (Inscription #${ligne.id_inscription || ligne.inscription?.id})`}
-                        </h3>
-                        
-                        <div className="flex flex-wrap gap-3">
-                          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
-                            <span className="text-[9px] text-slate-500 font-black">DU</span>
-                            <span className="text-xs text-blue-400 font-mono">
-                              {session?.dateDebut || session?.date_debut || "N/A"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
-                            <span className="text-[9px] text-slate-500 font-black">AU</span>
-                            <span className="text-xs text-purple-400 font-mono">
-                              {session?.dateFin || session?.date_fin || "N/A"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <button 
-                        onClick={() => navigate("/mes-cours")} 
-                        className="w-full md:w-auto bg-white text-black hover:bg-red-600 hover:text-white transition-all px-6 py-2 rounded-lg font-bold text-[10px] uppercase shadow-md"
-                      >
-                        Accéder
-                      </button>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="py-4 text-center text-slate-500 text-sm italic">
-                  Aucun détail trouvé pour cet achat.
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
+              {/* Détails : Infos Session récupérées depuis la table Session */}
+              <div className="p-5 space-y-4">
+                {lignes.length > 0 ? (
+                  lignes.map((ligne, idx) => (
+                    <div key={idx} className="flex flex-col md:flex-row gap-6 p-4 bg-slate-900/40 rounded-xl border border-slate-700/50 items-start md:items-center">
+                      <div className="flex-1 space-y-2">
+                        {/* Titre venant du DTO Java (formationTitre) */}
+                        <h3 className="text-red-600 font-bold text-lg uppercase tracking-tight">
+                          {ligne.titre || ligne.formationTitre || ligne.sessionTitre || "Titre non trouvé"}
+</h3>
+                        
+                        <div className="flex flex-wrap gap-3 mt-3">
+                          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                            <span className="text-[9px] text-slate-500 font-black">DU</span>
+                            <span className="text-xs text-slate-300 font-mono">
+                              {ligne.dateDebut ? new Date(ligne.dateDebut).toLocaleDateString('fr-FR') : "N/A"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                            <span className="text-[9px] text-slate-500 font-black">AU</span>
+                            <span className="text-xs text-slate-300 font-mono">
+                              {ligne.dateFin ? new Date(ligne.dateFin).toLocaleDateString('fr-FR') : "N/A"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-4 text-center text-slate-500 text-sm italic">
+                    Aucun détail de cours pour ce paiement.
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+    </div>
 )}
 
           {/* SECTION PEDAGOGIE */}
@@ -229,7 +233,7 @@ export default function DashboardApprenant() {
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">Suivi de Présence</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {presences.length > 0 ? presences.map(pres => {
-                    const formationTitre = pres.session?.formation?.titre || "Cours théorique";
+                    const formationTitre = pres.session?.titre;
                     return (
                       <div key={pres.id} className="p-4 bg-slate-800/30 rounded-xl border border-slate-800 flex justify-between items-center">
                         <div>

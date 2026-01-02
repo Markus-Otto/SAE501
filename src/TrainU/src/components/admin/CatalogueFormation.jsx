@@ -112,7 +112,7 @@ export default function CatalogueFormation() {
                     onClick={() => openModal()}
                     className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-2xl font-bold transition"
                 >
-                    ➕ Nouvelle Formation
+                Nouvelle Formation
                 </button>
             </div>
 
@@ -134,8 +134,8 @@ export default function CatalogueFormation() {
                         <p className="text-slate-400 text-sm mb-3 line-clamp-2">{formation.description}</p>
 
                         <div className="flex gap-2 text-xs text-slate-500 mb-4">
-                            <span>📚 {formation.categorie}</span>
-                            <span>⏱️ {formation.nbHeureTotal}h</span>
+                            <span>{formation.categorie}</span>
+                            <span>{formation.nbHeureTotal}h</span>
                         </div>
 
                         <div className="flex gap-2">
@@ -143,13 +143,13 @@ export default function CatalogueFormation() {
                                 onClick={() => openModal(formation)}
                                 className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition text-sm font-bold"
                             >
-                                ✏️ Modifier
+                            Modifier
                             </button>
                             <button
                                 onClick={() => handleDelete(formation.id)}
                                 className="flex-1 py-2 bg-red-600/20 hover:bg-red-600 rounded-lg transition text-sm font-bold"
                             >
-                                🗑️ Supprimer
+                            Supprimer
                             </button>
                         </div>
                     </div>

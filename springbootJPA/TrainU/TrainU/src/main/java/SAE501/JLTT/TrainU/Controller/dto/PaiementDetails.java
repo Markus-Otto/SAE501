@@ -19,8 +19,15 @@ public record PaiementDetails(
     public record Ligne(
             Integer inscriptionId,
             Integer montantCent,
-            String formationTitre,
+
+            // ✅ SESSION
+            Integer sessionId,
+            String sessionTitre,
+            String sessionDescription,
             LocalDateTime dateDebut,
-            LocalDateTime dateFin
+            LocalDateTime dateFin,
+
+            // (optionnel)
+            String formationTitre
     ) {}
 }

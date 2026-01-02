@@ -37,6 +37,7 @@ public class ApprenantService {
         a.setNom(details.getNom());
         a.setPrenom(details.getPrenom());
         a.setEmail(details.getEmail());
+        a.setTelephone(details.getTelephone());
 
         // ✅ Hachage du mot de passe s'il est modifié
         if (details.getMotDePasse() != null && !details.getMotDePasse().isEmpty()) {

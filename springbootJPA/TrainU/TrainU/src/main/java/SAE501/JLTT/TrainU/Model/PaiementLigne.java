@@ -18,8 +18,8 @@ public class PaiementLigne {
 
     @ManyToOne
     @JoinColumn(name = "id_inscription")
+    @JsonIgnoreProperties("apprenant") // On cache juste l'apprenant pour éviter les boucles
     private Inscription inscription;
-
     @ManyToOne
     @JoinColumn(name = "id_paiement")
     @JsonIgnore // 👈 Très important : ne pas re-sérialiser le paiement depuis la ligne

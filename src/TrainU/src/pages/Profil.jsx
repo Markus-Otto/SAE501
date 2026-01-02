@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom"; // Import manquant
+
 
 export default function Profil() {
   const { user, login } = useAuth();
-  const navigate = useNavigate(); // Définition du hook de navigation
   
   const [formData, setFormData] = useState({
     nom: user?.nom || "",
     prenom: user?.prenom || "",
     email: user?.email || "",
+    telephone: user?.telephone || "",
     password: "" 
   });
   
@@ -44,15 +44,6 @@ export default function Profil() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-8">
-      {/* Bouton Retour corrigé */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <button 
-          onClick={() => navigate("/DashboardApprenant")}
-          className="rounded-lg bg-slate-900 px-6 py-2 text-sm font-medium text-white hover:bg-slate-800 transition border border-white/10"
-        >
-          ← Retour au Dashboard
-        </button>
-      </div>
 
       <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl">
         <h1 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
@@ -82,7 +73,7 @@ export default function Profil() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Email professionnel</label>
+            <label className="block text-sm text-slate-400 mb-2">Email </label>
             <input 
               type="email" 
               value={formData.email} 
@@ -90,6 +81,15 @@ export default function Profil() {
               onChange={(e) => setFormData({...formData, email: e.target.value})} 
             />
           </div>
+          <div>
+                    <label className="block text-sm font-bold mb-2">Téléphone</label>
+                    <input
+                        type="tel"
+                        value={formData.telephone}
+                        onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+                        className="w-full p-3 bg-slate-800 rounded-xl border border-slate-700 focus:border-red-600 outline-none"
+                    />
+                </div>
 
           <div>
             <label className="block text-sm text-slate-400 mb-2">Nouveau mot de passe</label>
@@ -108,7 +108,7 @@ export default function Profil() {
           )}
 
           <button type="submit" className="w-full bg-red-600 hover:bg-red-700 py-4 rounded-xl font-bold transition shadow-lg shadow-red-900/20">
-            Sauvegarder les modifications
+            Mettre à jour le profil
           </button>
         </form>
       </div>

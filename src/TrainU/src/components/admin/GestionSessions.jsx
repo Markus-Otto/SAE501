@@ -196,7 +196,7 @@ export default function GestionSessions() {
                     onClick={() => openModal()}
                     className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-2xl font-bold transition"
                 >
-                    ➕ Nouvelle Session
+                Nouvelle Session
                 </button>
             </div>
 
@@ -213,29 +213,29 @@ export default function GestionSessions() {
 
                                 <div className="grid md:grid-cols-2 gap-2 text-sm">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">📚 Formation:</span>
+                                        <span className="text-slate-500">Formation:</span>
                                         <span className="text-white">{session.formation?.titre || "N/A"}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">👨‍🏫 Intervenant:</span>
+                                        <span className="text-slate-500">Intervenant:</span>
                                         <span className="text-white">
                                             {session.intervenant ? `${session.intervenant.prenom} ${session.intervenant.nom}` : "Non assigné"}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">📅 Début:</span>
+                                        <span className="text-slate-500">Début:</span>
                                         <span className="text-white">{new Date(session.dateDebut).toLocaleString()}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">📅 Fin:</span>
+                                        <span className="text-slate-500">Fin:</span>
                                         <span className="text-white">{new Date(session.dateFin).toLocaleString()}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">🏢 Salle:</span>
+                                        <span className="text-slate-500">Salle:</span>
                                         <span className="text-white">{session.salle || "Non définie"}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-500">👥 Places:</span>
+                                        <span className="text-slate-500">Places:</span>
                                         <span className="text-white">{session.nombreParticipants || 0}/{session.nombrePoste}</span>
                                     </div>
                                 </div>
@@ -247,19 +247,19 @@ export default function GestionSessions() {
                                 onClick={() => openInscriptionModal(session)}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition text-sm font-bold"
                             >
-                                👥 Gérer Inscriptions
+                            Gérer Inscriptions
                             </button>
                             <button
                                 onClick={() => openModal(session)}
                                 className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition text-sm font-bold"
                             >
-                                ✏️ Modifier
+                            Modifier
                             </button>
                             <button
                                 onClick={() => handleDelete(session.id)}
                                 className="px-4 py-2 bg-red-600/20 hover:bg-red-600 rounded-lg transition text-sm font-bold"
                             >
-                                🗑️ Supprimer
+                            Supprimer
                             </button>
                         </div>
                     </div>

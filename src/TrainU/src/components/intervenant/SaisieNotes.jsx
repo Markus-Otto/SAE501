@@ -127,7 +127,7 @@ export default function SaisieNotes() {
 
                     <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6">
                         <p className="text-yellow-500 text-sm">
-                            ℹ️ <strong>Note importante :</strong> Si la note est ≥ 10, le certificat sera automatiquement validé.
+                            <strong>Note importante :</strong> Si la note est ≥ 10, le certificat sera automatiquement validé.
                         </p>
                     </div>
 

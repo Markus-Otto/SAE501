@@ -15,11 +15,10 @@ public interface PaiementRepository extends JpaRepository<Paiement, Long> {
     // CETTE REQUÊTE EST LA CLÉ :
     // Elle "aspire" toutes les données liées en une seule fois
     @Query("SELECT DISTINCT p FROM Paiement p " +
-            "LEFT JOIN FETCH p.lignes l " + // ✅ Changé 'paiementLignes' en 'lignes'
-            "LEFT JOIN FETCH l.inscription i " +
-            "LEFT JOIN FETCH i.session s " +
-            "LEFT JOIN FETCH s.formation f " +
-            "WHERE p.apprenantId = :apprenantId " + // ✅ Vérifie aussi si c'est apprenantId ou apprenant.id
+            "LEFT JOIN FETCH p.lignes l " +           // Paiement -> Ligne
+            "LEFT JOIN FETCH l.inscription i " +      // Ligne -> Inscription
+            "LEFT JOIN FETCH i.session s " +          // Inscription -> Session (CRUCIAL)
+            "WHERE p.apprenantId = :apprenantId " +
             "ORDER BY p.dateCreation DESC")
     List<Paiement> findByApprenantId(@Param("apprenantId") Long apprenantId);
 }

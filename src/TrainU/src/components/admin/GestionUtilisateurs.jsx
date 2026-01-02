@@ -71,14 +71,14 @@ export default function GestionUtilisateurs() {
                     className={`px-6 py-3 rounded-xl font-bold transition ${activeTab === "apprenants" ? "bg-red-600" : "bg-slate-800"
                         }`}
                 >
-                    👨‍🎓 Apprenants ({apprenants.length})
+                Apprenants ({apprenants.length})
                 </button>
                 <button
                     onClick={() => setActiveTab("intervenants")}
                     className={`px-6 py-3 rounded-xl font-bold transition ${activeTab === "intervenants" ? "bg-red-600" : "bg-slate-800"
                         }`}
                 >
-                    👨‍🏫 Intervenants ({intervenants.length})
+                Intervenants ({intervenants.length})
                 </button>
             </div>
 

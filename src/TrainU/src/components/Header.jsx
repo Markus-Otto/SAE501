@@ -27,13 +27,16 @@ export default function Header() {
   )}
   
   {user?.role === "admin" && (
-    <Link to="/admin/dashboard" className="text-blue-500 font-bold">Gestion Admin</Link>
+    <Link to="/admin/dashboard" className="text-red-500 font-bold">Mon Dashboard</Link>
+  )}
+  {user?.role === "intervenant" && (
+    <Link to="/intervenant/dashboard" className="text-red-500 font-bold">Mon Dashboard</Link>
   )}
 
   {/* Espace connexion/déconnexion */}
   {user ? (
     <div className="flex items-center gap-3">
-       <span className="text-xs text-slate-400 italic">Compte {user.role}</span>
+       
        <button onClick={logout} className="...">Déconnexion</button>
     </div>
   ) : (

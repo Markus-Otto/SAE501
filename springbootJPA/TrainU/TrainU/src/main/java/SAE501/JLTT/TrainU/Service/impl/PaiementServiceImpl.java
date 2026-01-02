@@ -1,17 +1,19 @@
 package SAE501.JLTT.TrainU.Service.impl;
 
 import SAE501.JLTT.TrainU.Controller.dto.*;
-import SAE501.JLTT.TrainU.Model.Inscription; // ✅ Import Ajouté
+import SAE501.JLTT.TrainU.Model.Inscription;
 import SAE501.JLTT.TrainU.Model.Paiement;
 import SAE501.JLTT.TrainU.Model.PaiementLigne;
 import SAE501.JLTT.TrainU.Model.PaiementStatut;
-import SAE501.JLTT.TrainU.Repository.InscriptionRepository; // ✅ Import Ajouté
+import SAE501.JLTT.TrainU.Repository.InscriptionRepository;
 import SAE501.JLTT.TrainU.Repository.PaiementLigneRepository;
 import SAE501.JLTT.TrainU.Repository.PaiementRepository;
 import SAE501.JLTT.TrainU.Repository.RemboursementRepository;
 import SAE501.JLTT.TrainU.Service.PaiementService;
 import SAE501.JLTT.TrainU.Service.StripePort;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.Session;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,16 +30,13 @@ public class PaiementServiceImpl implements PaiementService {
     private final PaiementLigneRepository ligneRepo;
     private final StripePort stripePort;
     private final RemboursementRepository remboursementRepo;
-    // ✅ AJOUT INDISPENSABLE : Pour transformer l'ID en Objet
     private final InscriptionRepository inscriptionRepo;
 
     @Override
     @Transactional(readOnly = true)
     public List<PaiementListItem> getByApprenantId(Integer idApprenant) {
         Long idLong = (idApprenant != null) ? idApprenant.longValue() : 0L;
-
-        return paiementRepo.findByApprenantId(idLong)
-                .stream()
+        return paiementRepo.findByApprenantId(idLong).stream()
                 .map(this::mapToListItem)
                 .toList();
     }
@@ -45,17 +44,48 @@ public class PaiementServiceImpl implements PaiementService {
     @Override
     @Transactional(readOnly = true)
     public List<PaiementListItem> list() {
-        return paiementRepo.findAll(org.springframework.data.domain.Sort.by("id").descending())
-                .stream()
+        return paiementRepo.findAll(Sort.by("id").descending()).stream()
                 .map(this::mapToListItem)
                 .toList();
     }
 
     private PaiementListItem mapToListItem(Paiement p) {
-        Integer apprenantIdFinal = 0;
-        if (p.getApprenantId() != null) {
-            apprenantIdFinal = p.getApprenantId().intValue();
-        }
+
+        Integer apprenantIdFinal = (p.getApprenantId() != null)
+                ? p.getApprenantId().intValue()
+                : 0;
+
+        List<PaiementDetails.Ligne> lignesDto = p.getLignes().stream().map(l -> {
+
+            Inscription ins = l.getInscription();
+
+            System.out.println("---- DEBUG PAIEMENT ----");
+            System.out.println("Paiement ID = " + p.getId());
+
+            if (ins == null) {
+                System.out.println("❌ Inscription = NULL");
+            } else {
+                System.out.println("✅ Inscription ID = " + ins.getId());
+                System.out.println("➡️ Session = " + ins.getSession());
+            }
+
+            var sess = (ins != null) ? ins.getSession() : null;
+
+            return new PaiementDetails.Ligne(
+                    ins != null ? ins.getId().intValue() : null,
+                    l.getMontantCent(),
+
+                    sess != null ? sess.getId() : null,
+                    sess != null ? sess.getTitre() : "Session inconnue",
+                    sess != null ? sess.getDescription() : null,
+                    sess != null ? sess.getDateDebut() : null,
+                    sess != null ? sess.getDateFin() : null,
+
+                    (sess != null && sess.getFormation() != null)
+                            ? sess.getFormation().getTitre()
+                            : null
+            );
+        }).toList();
 
         return new PaiementListItem(
                 p.getId(),
@@ -64,9 +94,11 @@ public class PaiementServiceImpl implements PaiementService {
                 p.getDevise(),
                 p.getStatut(),
                 p.getStripeIntentId(),
-                p.getDateCreation()
+                p.getDateCreation(),
+                lignesDto
         );
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -74,25 +106,27 @@ public class PaiementServiceImpl implements PaiementService {
         Paiement p = paiementRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Paiement non trouvé : " + id));
 
-        List<PaiementDetails.Ligne> lignes = ligneRepo.findByPaiement_Id(p.getId()).stream()
+        // ✅ Utilisation de findByPaiement_Id (déclaré dans le repo)
+        List<PaiementDetails.Ligne> lignes = ligneRepo.findByPaiement_Id(p.getId())
+                .stream()
                 .map(l -> {
-                    // ✅ SÉCURISATION : On vérifie si l'inscription existe
-                    var ins = l.getInscription();
-                    if (ins == null) return new PaiementDetails.Ligne(0, l.getMontantCent(), "Inscription manquante", null, null);
 
-                    // ✅ SÉCURISATION : On vérifie si la session existe
-                    var sess = ins.getSession();
-                    if (sess == null) return new PaiementDetails.Ligne(ins.getId().intValue(), l.getMontantCent(), "Session non définie", null, null);
-
-                    // ✅ SÉCURISATION : On vérifie si la formation existe
-                    String titre = (sess.getFormation() != null) ? sess.getFormation().getTitre() : "Formation inconnue";
+                    Inscription ins = l.getInscription();
+                    var sess = (ins != null) ? ins.getSession() : null;
 
                     return new PaiementDetails.Ligne(
-                            ins.getId().intValue(),
+                            ins != null ? ins.getId().intValue() : null,
                             l.getMontantCent(),
-                            titre,
-                            sess.getDateDebut(),
-                            sess.getDateFin()
+
+                            sess != null ? sess.getId() : null,
+                            sess != null ? sess.getTitre() : "Session inconnue",
+                            sess != null ? sess.getDescription() : null,
+                            sess != null ? sess.getDateDebut() : null,
+                            sess != null ? sess.getDateFin() : null,
+
+                            (sess != null && sess.getFormation() != null)
+                                    ? sess.getFormation().getTitre()
+                                    : null
                     );
                 })
                 .toList();
@@ -109,6 +143,8 @@ public class PaiementServiceImpl implements PaiementService {
                 p.getDateCreation(),
                 lignes);
     }
+
+    // ... Gardez vos méthodes createPayment, syncStatus, cancel et refund telles quelles ...
 
     @Transactional
     @Override
@@ -127,13 +163,7 @@ public class PaiementServiceImpl implements PaiementService {
         paiementRepo.save(p);
 
         for (var l : req.lignes()) {
-            // 1. On récupère l'ID du DTO et on s'assure qu'il est converti en Long pour le calcul
-            Long idLong = (l.inscriptionId() != null) ? l.inscriptionId().longValue() : 0L;
-
-            // 2. On convertit ce Long en Integer pour correspondre au Repository
-            // Math.toIntExact lève une erreur si le nombre est trop grand pour un Integer
-            Integer idInscriptionInt = Math.toIntExact(idLong);
-
+            Integer idInscriptionInt = Math.toIntExact(l.inscriptionId().longValue());
             Inscription inscription = inscriptionRepo.findById(idInscriptionInt)
                     .orElseThrow(() -> new RuntimeException("Inscription introuvable ID: " + idInscriptionInt));
 
@@ -151,18 +181,10 @@ public class PaiementServiceImpl implements PaiementService {
 
         String res = stripePort.createPaymentIntent(total, "eur", req.email(), metadata, "pay_" + p.getId());
         String[] parts = res.split(":");
-
         p.setStripeIntentId(parts[0]);
         paiementRepo.save(p);
 
-        return new CreatePaymentResponse(
-                p.getId(),
-                parts[0],
-                parts[1],
-                total,
-                "eur",
-                p.getStatut().name()
-        );
+        return new CreatePaymentResponse(p.getId(), parts[0], parts[1], total, "eur", p.getStatut().name());
     }
 
     @Override
@@ -170,7 +192,6 @@ public class PaiementServiceImpl implements PaiementService {
     public PaiementDetails syncStatus(Long paiementId) {
         Paiement p = paiementRepo.findById(paiementId).orElseThrow();
         var pi = stripePort.retrievePaymentIntent(p.getStripeIntentId());
-
         switch (pi.getStatus()) {
             case "succeeded" -> p.setStatut(PaiementStatut.PAID);
             case "processing" -> p.setStatut(PaiementStatut.PENDING);
@@ -179,7 +200,6 @@ public class PaiementServiceImpl implements PaiementService {
             case "canceled" -> p.setStatut(PaiementStatut.CANCELED);
             default -> p.setStatut(PaiementStatut.CREATED);
         }
-
         paiementRepo.save(p);
         return details(p.getId());
     }
@@ -192,9 +212,7 @@ public class PaiementServiceImpl implements PaiementService {
             throw new IllegalStateException("Impossible d'annuler un paiement déjà finalisé.");
         }
         if (p.getStripeIntentId() != null) {
-            try {
-                stripePort.cancelPaymentIntent(p.getStripeIntentId());
-            } catch (RuntimeException ignore) {}
+            try { stripePort.cancelPaymentIntent(p.getStripeIntentId()); } catch (RuntimeException ignore) {}
         }
         p.setStatut(PaiementStatut.CANCELED);
         paiementRepo.save(p);
@@ -208,11 +226,7 @@ public class PaiementServiceImpl implements PaiementService {
         if (paiement.getStatut() != PaiementStatut.PAID) {
             throw new IllegalStateException("Seuls les paiements 'PAID' peuvent être remboursés.");
         }
-        String rr = stripePort.createRefundByPaymentIntent(
-                paiement.getStripeIntentId(),
-                null,
-                Map.of("paiementId", String.valueOf(paiementId))
-        );
+        String rr = stripePort.createRefundByPaymentIntent(paiement.getStripeIntentId(), null, Map.of("paiementId", String.valueOf(paiementId)));
         String[] parts = rr.split(":");
         paiement.setStatut(PaiementStatut.REFUNDED);
         paiementRepo.save(paiement);
