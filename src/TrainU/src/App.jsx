@@ -20,6 +20,7 @@ import DashboardApprenant from "./pages/Dashboardapp.jsx";
 import DashboardAdmin from "./pages/DashboardAdmin.jsx";
 import DashboardIntervenant from "./pages/DashboardIntervenant.jsx";
 import Profil from "./pages/Profil.jsx";
+import MentionsLegales from "./pages/MentionsLegales.jsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/formation" element={<Formation />} />
               <Route path="/formation/:id" element={<FormationDetail />} />
               <Route path="/signutilisateur" element={<SignUtilisateur />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
 
               {/* --- ROUTES PROTÉGÉES : APPRENANT --- */}
               <Route element={<ProtectedRoute allowedRoles={["apprenant", "utilisateur"]} />}>
