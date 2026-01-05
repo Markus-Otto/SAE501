@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://java-trainu.onrender.com";
 
 export default function ProfilIntervenant() {
     const { user } = useAuth();

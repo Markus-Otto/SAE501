@@ -2,7 +2,7 @@
 
 export async function loginRequest({ email, password, role }) {
   
-  const res = await fetch("http://localhost:8080/api/auth/login", {
+  const res = await fetch("https://java-trainu.onrender.com/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, role }), 

@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificats")
-@CrossOrigin(origins = "http://localhost:5173") // Plus sécurisé que "*"
+@CrossOrigin(origins = "*")
 public class CertificatController {
 
     @Autowired

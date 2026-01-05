@@ -15,7 +15,7 @@ export default function SessionSelection() {
   const [selectedSessions, setSelectedSessions] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/session/formation/${id}/sessions`)
+    fetch(`https://java-trainu.onrender.com/api/session/formation/${id}/sessions`)
       .then((res) => res.json())
       .then((data) => {
         setAllSessions(Array.isArray(data) ? data : []);

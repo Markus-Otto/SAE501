@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Scene3D from '../components/ClassroomModel';
 
 export default function Accueil() {
   return (
@@ -75,16 +76,12 @@ export default function Accueil() {
                 pour renforcer l’expérience pédagogique : visualisation, interaction
                 et apprentissage dynamique.
               </p>
-              <p className="mt-4 text-sm text-slate-400">
-                (Cette section utilisera Three.js – structure déjà prête)
-              </p>
             </div>
 
             {/* Placeholder Three.js */}
             <div className="aspect-video rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-white/10">
-              <span className="text-slate-400 text-sm">
-                Salle de classe 3D (à venir)
-              </span>
+              <Scene3D />
+              
             </div>
           </div>
         </div>

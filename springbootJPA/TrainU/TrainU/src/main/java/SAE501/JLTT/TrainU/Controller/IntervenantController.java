@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/intervenants")
+@CrossOrigin(origins = "*")
 public class IntervenantController {
 
     private final IntervenantService intervenantService;

@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inscriptions")
+@CrossOrigin(origins = "*")
 public class InscriptionController {
 
     private final InscriptionService inscriptionService;

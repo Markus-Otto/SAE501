@@ -40,7 +40,7 @@ export default function SignUtilisateur() {
 
     try {
       // Appel API pour créer l'apprenant selon le diagramme
-      const response = await fetch("http://localhost:8080/api/apprenants", {
+      const response = await fetch("https://java-trainu.onrender.com/api/apprenants", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

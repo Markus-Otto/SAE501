@@ -14,7 +14,7 @@ import LoginUtilisateur from "./pages/LoginUtilisateur.jsx";
 import LoginIntervenant from "./pages/LoginIntervenant";
 import LoginAdmin from "./pages/LoginAdmin";
 import SessionSelection from "./pages/SessionSelection.jsx";
-import Paiement from "./pages/paiement.jsx";
+import Paiement from "./pages/Paiement.jsx";
 import SignUtilisateur from "./pages/SignUtilisateur.jsx";
 import DashboardApprenant from "./pages/Dashboardapp.jsx";
 import DashboardAdmin from "./pages/DashboardAdmin.jsx";

@@ -1,4 +1,6 @@
-const API_BASE = "/api/formation";
+const API_BASE = "https://java-trainu.onrender.com/api/formation";
+
+
 
 /**
  * Récupère toutes les formations
