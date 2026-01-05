@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inscriptions")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class InscriptionController {
 
     private final InscriptionService inscriptionService;

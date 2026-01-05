@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/session")
-@CrossOrigin(origins = "*") // Permet d'éviter les erreurs CORS avec React
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class SessionController {
 
     private final SessionService service;

@@ -86,8 +86,9 @@ TEST SAE :
 Email: lucas.martin@test.com
 Mot de passe: LucasPass2024!
 ```
-
-
+ cd SAE501  
+ docker push 0roc0/java-trainu:latest
+docker build -t 0roc0/java-trainu:latest .
 
 # CB TEST STRIPE :
 

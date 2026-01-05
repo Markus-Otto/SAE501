@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class PaiementController {
 
     private final PaiementService paiementService;

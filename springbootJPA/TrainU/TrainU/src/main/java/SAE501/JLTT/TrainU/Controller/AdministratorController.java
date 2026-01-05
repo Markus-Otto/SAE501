@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/administrator")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class AdministratorController {
 
     private final AdministratorService administratorService;

@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/emargement")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class EmargementController {
 
     private final EmargementService service;

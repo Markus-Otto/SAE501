@@ -23,7 +23,7 @@ public class SecurityConfig {
                 // 1. Activer et configurer le CORS
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173", "https://ton-site-react.vercel.app"));
+                    config.setAllowedOrigins(List.of("http://localhost:5173", "https://trainu.alwaysdata.net"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     return config;

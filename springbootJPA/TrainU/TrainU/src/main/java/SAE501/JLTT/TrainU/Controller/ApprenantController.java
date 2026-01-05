@@ -10,8 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/apprenants")
-// ✅ Étape 1 : Autoriser React (CORS)
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"https://trainu.alwaysdata.net", "http://localhost:5173"})
 public class ApprenantController {
 
     private final ApprenantService apprenantService;
