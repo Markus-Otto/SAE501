@@ -23,7 +23,7 @@ export default function Profil() {
     if (!dataToSend.password) delete dataToSend.password;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/apprenants/${user.id}`, {
+      const response = await fetch(`https://java-trainu.onrender.com/api/apprenants/${user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend),

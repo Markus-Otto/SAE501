@@ -20,9 +20,9 @@ export default function DashboardApprenant() {
     setLoading(true);
     const id = user.id;
     const urls = [
-      `http://localhost:8080/api/certificats/apprenant/${id}`,
-      `http://localhost:8080/api/emargement/apprenant/${id}`,
-      `http://localhost:8080/api/payments/apprenant/${id}`,
+      `https://java-trainu.onrender.com/api/certificats/apprenant/${id}`,
+      `https://java-trainu.onrender.com/api/emargement/apprenant/${id}`,
+      `https://java-trainu.onrender.com/api/payments/apprenant/${id}`,
 
     ];
 
@@ -55,7 +55,7 @@ export default function DashboardApprenant() {
 }
 
   const handleDownload = (certId) => {
-    window.open(`http://localhost:8080/api/certificats/download/${certId}`, "_blank");
+    window.open(`https://java-trainu.onrender.com/api/certificats/download/${certId}`, "_blank");
   };
 
   if (loading) {

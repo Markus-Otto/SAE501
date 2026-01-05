@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/emargement")
-@CrossOrigin(origins = "*") // Nécessaire pour que React puisse communiquer avec Java
+@CrossOrigin(origins = "*")
 public class EmargementController {
 
     private final EmargementService service;

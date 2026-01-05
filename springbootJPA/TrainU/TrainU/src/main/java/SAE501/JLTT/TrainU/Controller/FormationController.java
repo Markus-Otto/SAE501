@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/formation")
+@CrossOrigin(origins = "*")
 public class FormationController {
 
     private final FormationService service;

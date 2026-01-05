@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://java-trainu.onrender.com";
 
 export default function GestionSessions() {
     const [sessions, setSessions] = useState([]);

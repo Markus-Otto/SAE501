@@ -1,6 +1,8 @@
 # SAE501
 SAE501 - Groupe - Timothée Carpentier, Liam Cheurfa, Joris Brusa, Tom Manlay.
 
+Lien du site: https://trainu.alwaysdata.net/
+
 POUR MES CAMARADES : 
 COMMANDE A UTILISER POUR L'IMPORT DE TAILWIND 3.4 SI TAILWINDCSS ne s'affiche pas une fois l'import du GIT REALISER.
 
@@ -98,3 +100,9 @@ Mot de passe: LucasPass2024!
 - Refus - CB volée - 4000 0000 0000 9979
 - Refus - CVC incorrect - 4000 0000 0000 0101 
 ```
+# LIEN UTILES :
+
+Trello - https://trello.com/invite/b/6915a778f2abc31d70ff67cd/ATTI47c412200b19b4ceeaa3b858b2ccd6f6E08B033B/sae-501
+
+Figma - https://www.figma.com/design/Gn8XuYvYqbig8Ghebyyaaa/Sae501-TrainU?node-id=184-2&t=m4etcHph4kvyuxzm-1
+

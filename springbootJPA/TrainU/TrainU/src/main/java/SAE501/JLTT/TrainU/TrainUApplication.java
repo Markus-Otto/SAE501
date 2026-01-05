@@ -10,6 +10,8 @@ public class TrainUApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TrainUApplication.class, args);
+        System.out.println("🚀 L'APPLICATION DÉMARRE");
+        System.out.println("✅ SPRING A DÉMARRÉ");
 	}
 
 }
