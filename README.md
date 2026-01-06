@@ -67,8 +67,8 @@ Mot de passe: admin123
 admin@test.com
 
 TEST SAE :
-Login: superadmin 
-Mot de passe: SuperPass2024!
+Login: admin@test.com
+Mot de passe: admin123
 ```
 ```
 - INTERVENANTS
