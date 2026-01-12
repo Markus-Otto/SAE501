@@ -7,11 +7,11 @@ import { useAuth } from "../context/AuthContext";
 export default function LoginUtilisateur() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false); // ✅ Ajout pour gérer l'état de chargement
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   
   const navigate = useNavigate();
-  const { pathname } = useLocation(); // ✅ Maintenant défini grâce à l'import
+  const { pathname } = useLocation(); 
   const { login } = useAuth();
 
  async function handleSubmit(e) {
@@ -20,22 +20,16 @@ export default function LoginUtilisateur() {
   setError(null);
   
   try {
-    // ✅ On ajoute le rôle explicitement ici
     const data = await loginRequest({ 
       email, 
       password, 
-      role: "apprenant" // On force le rôle pour cette page de login
+      role: "apprenant" 
     });
-    
-    // Si l'API renvoie une erreur parce que c'est un admin, 
-    // elle tombera directement dans le catch(err)
     
     login(data);
     navigate("/DashboardApprenant");
 
   } catch (err) {
-    // L'erreur affichera "Accès refusé" ou "Identifiants incorrects" 
-    // selon ce que ton Backend renvoie
     setError(err.message || "Identifiants incorrects");
   } finally {
     setBusy(false);
